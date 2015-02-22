@@ -1,10 +1,10 @@
 # depslib dependency file v1.0
-1422556372 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/computeMatricesFromInput.cpp
+1424637644 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/computeMatricesFromInput.cpp
 	"ComputeMatricesFromInput.hpp"
 	<cmath>
 	<iostream>
 
-1422374714 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/ComputeMatricesFromInput.hpp
+1424637666 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/ComputeMatricesFromInput.hpp
 	<memory>
 	<glm/glm.hpp>
 	<glm/gtx/transform.hpp>
@@ -755,7 +755,7 @@
 	<string>
 	<vector>
 
-1424123046 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/controller.cpp
+1424605560 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/controller.cpp
 	<iostream>
 	<SFML/System.hpp>
 	"Controller.hpp"
@@ -765,7 +765,7 @@
 	"OGLRenderer.hpp"
 	"World.hpp"
 
-1424550246 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/OGLRenderer.hpp
+1424641235 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/OGLRenderer.hpp
 	<memory>
 	<vector>
 	<GL/glew.h>
@@ -790,7 +790,7 @@
 1424386182 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/Shader.hpp
 	<memory>
 
-1424550260 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/World.hpp
+1424641020 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/World.hpp
 	"OBJMesh.hpp"
 	"ShaderNode.hpp"
 
@@ -804,10 +804,11 @@
 	<GL/glew.h>
 	<glm/glm.hpp>
 
-1424550309 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/ShaderNode.hpp
+1424559505 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/ShaderNode.hpp
 	"Node.hpp"
+	"OGLRenderer.hpp"
 
-1424550304 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/Node.hpp
+1424560803 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/Node.hpp
 	<glm/glm.hpp>
 	<vector>
 	<memory>
@@ -828,7 +829,7 @@
 	<iostream>
 	"Mesh.hpp"
 
-1424382740 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/node.cpp
+1424559470 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/node.cpp
 	<iostream>
 	"Node.hpp"
 
@@ -841,13 +842,15 @@
 	<map>
 	"OBJMesh.hpp"
 
-1424551215 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/oglRenderer.cpp
+1424641411 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/oglRenderer.cpp
 	<iostream>
+	<glm/gtc/type_ptr.hpp>
 	"OGLRenderer.hpp"
 	"World.hpp"
 	"ComputeMatricesFromInput.hpp"
 	"SimpleShader.hpp"
 	"Texture2DShader.hpp"
+	"LightingShader.hpp"
 
 1424379852 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/SimpleShader.hpp
 	"Shader.hpp"
@@ -855,26 +858,73 @@
 1424386512 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/Texture2DShader.hpp
 	"Shader.hpp"
 
-1424550273 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/sceneNode.cpp
+1424629777 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/sceneNode.cpp
 	<iostream>
 	<glm/gtx/transform.hpp>
 	<glm/gtc/matrix_transform.hpp>
 	<GL/glew.h>
 	"SceneNode.hpp"
+	"ShaderNode.hpp"
 
-1424550269 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/SceneNode.hpp
+1424628443 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/SceneNode.hpp
 	"Node.hpp"
 	"OGLRenderer.hpp"
 
-1424550278 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/shaderNode.cpp
+1424559518 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/shaderNode.cpp
 	<iostream>
 	"ShaderNode.hpp"
 	"OGLRenderer.hpp"
 
-1424551233 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/world.cpp
+1424638244 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/world.cpp
 	<iostream>
 	"World.hpp"
 	"OGLRenderer.hpp"
-	"Texture2DShader.hpp"
 	"SceneNode.hpp"
+
+1424622349 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/DirLightShader.hpp
+	"Texture2DShader.hpp"
+
+1388871056 /home/rts/Libraries/glm-dev_0.9.5.1-1_all/usr/include/glm/gtc/type_ptr.hpp
+	"../gtc/quaternion.hpp"
+	"../vec2.hpp"
+	"../vec3.hpp"
+	"../vec4.hpp"
+	"../mat2x2.hpp"
+	"../mat2x3.hpp"
+	"../mat2x4.hpp"
+	"../mat3x2.hpp"
+	"../mat3x3.hpp"
+	"../mat3x4.hpp"
+	"../mat4x2.hpp"
+	"../mat4x3.hpp"
+	"../mat4x4.hpp"
+	<cstring>
+	"type_ptr.inl"
+
+1388871062 /home/rts/Libraries/glm-dev_0.9.5.1-1_all/usr/include/glm/gtc/quaternion.hpp
+	"../mat3x3.hpp"
+	"../mat4x4.hpp"
+	"../vec3.hpp"
+	"../vec4.hpp"
+	"../gtc/constants.hpp"
+	"quaternion.inl"
+
+1388871062 /home/rts/Libraries/glm-dev_0.9.5.1-1_all/usr/include/glm/gtc/constants.hpp
+	"../detail/setup.hpp"
+	"constants.inl"
+
+1388871062 /home/rts/Libraries/glm-dev_0.9.5.1-1_all/usr/include/glm/gtc/constants.inl
+	<limits>
+
+1388871062 /home/rts/Libraries/glm-dev_0.9.5.1-1_all/usr/include/glm/gtc/quaternion.inl
+	"../trigonometric.hpp"
+	"../geometric.hpp"
+	"../exponential.hpp"
+	<limits>
+
+1388871056 /home/rts/Libraries/glm-dev_0.9.5.1-1_all/usr/include/glm/gtc/type_ptr.inl
+	<cstring>
+
+1424626741 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/LightingShader.hpp
+	"Texture2DShader.hpp"
 

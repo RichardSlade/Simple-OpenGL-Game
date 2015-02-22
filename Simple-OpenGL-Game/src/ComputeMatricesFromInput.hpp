@@ -19,6 +19,7 @@ glm::mat4 getProjectionMatrix();
 
 glm::vec3 getViewDirection();
 
-void computeMatricesFromInput(sf::RenderWindow *window, sf::Time dt);
+void computeMatricesFromInput(sf::RenderWindow *window
+										, sf::Time dt);
 
 #endif // COMPUTEMATRICESFROMINPUT_HPP

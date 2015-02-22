@@ -62,8 +62,7 @@ void Controller::run()
 		}
 
 		mWindow->clear();
-
-		mWorld->display();
+		mWorld->drawWorld();
 
 		// Finally, display the rendered frame on screen
 		mWindow->display();

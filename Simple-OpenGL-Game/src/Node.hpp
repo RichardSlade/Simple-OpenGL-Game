@@ -11,10 +11,18 @@ class Node
 public:
 	typedef std::unique_ptr<Node> NodeUPtr;
 
+//	enum NodeType
+//	{
+//		SimpleShaderNode,
+//		Texture2DNode,
+//		Root,
+//		ScNode,
+//		NumNodeTypes
+//	};
+
 	enum NodeType
 	{
-		SimpleShaderNode,
-		Texture2DNode,
+		ShdrNode,
 		Root,
 		ScNode,
 		NumNodeTypes
@@ -37,7 +45,8 @@ public:
 
 	virtual 							~Node(){};
 
-	virtual void 					draw(glm::mat4 VP);
+	virtual void 					draw(glm::mat4 V
+											 , glm::mat4 P);
 
 	void 								attachChild(NodeUPtr node);
 	void 								removeChild();

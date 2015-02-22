@@ -14,7 +14,6 @@
 
 #include "LoadShaders.h"
 #include "Shader.hpp"
-//#include "SimpleShader.hpp"
 
 class World;
 
@@ -26,11 +25,14 @@ public:
 	enum VertexArrays
 	{
 		CubeSimpleVAO,
-		CubeTexVAO,
+//		CubeTexVAO,
 		CubeDirLightVAO,
+		CubePntLightVAO,
 		EarthSimpleVAO,
-		EarthTexVAO,
+//		EarthTexVAO,
 		EarthDirLightVAO,
+		EarthPntLightVAO,
+		LightVAO,
 		NumVAO
 	};
 
@@ -42,6 +44,7 @@ public:
 		EarthVertBuf,
 		EarthNormBuf,
 		EarthTexBuf,
+		LightColBuf,
 		NumVBO
 	};
 
@@ -62,8 +65,9 @@ public:
 	enum Programs
 	{
 		SimpleProgram,
-		Texture2DProgram,
-		DirectionLightingProgram,
+		Tex2DProgram,
+		DirLightProgram,
+		PntLightProgram,
 		NumPrograms
 	};
 
@@ -77,7 +81,13 @@ private:
 
 	GLuint						mShadingProgramID[NumPrograms];
 
-	glm::mat4					mVPMatrix;
+//	glm::mat4					mVPMatrix;
+
+	glm::mat4 					mVMatrix;
+	glm::mat4 					mPMatrix;
+
+	glm::vec3 					*mDirLightSource;
+	std::vector<glm::vec3> 	*mPntLightSources;
 
 	std::vector<Shader::ShaderUPtr> mShaderInfo;
 
@@ -99,14 +109,15 @@ public:
 
 	void 						setupShader(int shaderID);
 
-	void 						draw(GLuint VAO
+	void 						draw(glm::mat4 MVP
+									, glm::mat4 MV
+									, GLuint VAO
 									, GLuint EBO
 									, GLuint numElements
 									, GLuint texBuffer
 									, GLenum texTarget
-									, GLint samplerID
-									, GLint MVPID
-									, glm::mat4 MVP);
+									, Shader *shdrInfo
+									, Programs progType);
 
 	void 						calcVPMatrix();
 
@@ -123,8 +134,14 @@ public:
 	GLenum 					getTexTarget(Textures tex)
 								{ return mTexTargets[tex]; }
 
-	glm::mat4 				getVPMatrix()
-								{ return mVPMatrix; }
+//	glm::mat4 				getVPMatrix()
+//								{ return mVPMatrix; }
+
+	glm::mat4 				getPMatrix()
+								{ return mPMatrix; }
+
+	glm::mat4 				getVMatrix()
+								{ return mVMatrix; }
 
 	GLuint					getShaderProgramID(int program)
 								{ return mShadingProgramID[program]; }
@@ -134,6 +151,13 @@ public:
 
 	unsigned int 			getShaderCount()
 								{ return mShaderInfo.size(); }
+
+	// Setters
+	void 						setDirLightSource(glm::vec3 *newDirLightSource)
+								{ mDirLightSource = newDirLightSource; }
+
+	void 						setPntLightSources(std::vector<glm::vec3> *newPntLightSources)
+								{ mPntLightSources = newPntLightSources; }
 };
 
 #endif // OGLRENDERER_HPP

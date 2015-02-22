@@ -1,55 +1,63 @@
 #version 330 core
 
-struct PointLightSource
-{
-	bool 			isEnabled;
-	int 			type;
+//struct PointLightSource
+//{
+//	bool 			isEnabled;
+//	int 			type;
+//
+//	vec3			ambient;
+//	vec3			colour;
+//	vec3 			position;
+//    vec3 			halfVector;
+//
+//	float			constantAttenuation;
+//	float			linearAttenuation;
+//	float 			quadraticAttenuation;
+//};
 
-	vec3			ambient;
-	vec3			colour;
-	vec3 			position;
-    vec3 			halfVector;
+//uniform PointLightSource LightSource;
 
-	float			constantAttenuation;
-	float			linearAttenuation;
-	float 			quadraticAttenuation;
-};
-
-uniform PointLightSource LightSource;
-
-uniform float Shininess;
-uniform float Strength;
+uniform vec3 LightPosition;
+//uniform float Shininess;
+//uniform float Strength;
 uniform vec3 EyeDirection;
+uniform sampler2D Tex2DSampler;
 
 in vec4 Position;
 in vec2 UV;
 in vec3 Normal;
 
-uniform sampler2D Tex2DSampler;
-
 out vec4 FragColour;
 
 void main()
 {
+	vec3 ambient = vec3(0.1, 0.1, 0.1);
+	vec3 lightColour = vec3(0.7, 0.7, 0.7);
+
+	float shininess = 20;
+	float strength = 2;
+
+	float constantAttenuation = 1;
+	float linearAttenuation = 0;
+	float quadraticAttenuation = 0;
+
 	vec3 scatteredLight = vec3(0.0);
 	vec3 reflectedLight = vec3(0.0);
 
-	vec3 halfVector;
-	vec3 lightDirection = LightSource.position;
+	vec3 lightDirection = LightPosition;
 
-	lightDirection = lightDirection - vec3(Position);
+	lightDirection = (lightDirection - vec3(Position));
 	float lightDistance = length(lightDirection);
-	lightDirection = lightDirection / lightDistance;
+	lightDirection = (lightDirection / lightDistance);
 
 	float attenuation = 1.0 /
-				  (LightSource.constantAttenuation
-					+ LightSource.linearAttenuation * lightDistance
-					+ LightSource.quadraticAttenuation * lightDistance
-					(* lightDistance);
+				  (constantAttenuation
+					+ linearAttenuation * lightDistance
+					+ quadraticAttenuation * lightDistance * lightDistance);
 
+//	float attenuation = 2.0;
 
-
-	halfVector = normalize(lightDirection + EyeDirection);
+	vec3 halfVector = normalize(lightDirection + EyeDirection);
 
 	float diffuse = max(0.0, dot(Normal, lightDirection));
 	float specular = max(0.0, dot(Normal, halfVector));
@@ -57,17 +65,21 @@ void main()
 	if(diffuse == 0.0)
 		specular = 0.0;
 	else
-		specular = pow(specular, Shininess) * Strength;
+		specular = pow(specular, shininess) * strength;
 
-	scatteredLight += LightSource.ambient * attenuation
-						+ LightSource.colour * diffuse * attenuation;
+	scatteredLight += ambient * attenuation
+						+ lightColour * diffuse * attenuation;
 
-	reflectedLight += LightSource.colour * specular * attenuation;
+	reflectedLight += lightColour * specular * attenuation;
 
+//	reflectedLight = vec3(0);
 
 	vec4 texColour = texture2D(Tex2DSampler, UV);
-	vec3 rgb = min(texColour.rgb * vec3(0.7, 0.7, 0.7), vec3(1.0));
+	vec3 rgb = min(texColour.rgb * scatteredLight + reflectedLight, vec3(1.0));
 	FragColour = vec4(rgb, texColour.a);
+
+//	FragColour = vec4(1, 1, 0, 1);
+//	FragColour = texColour;
 }
 
 

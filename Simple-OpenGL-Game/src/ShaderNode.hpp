@@ -2,38 +2,48 @@
 #define SHADERNODE_HPP
 
 #include "Node.hpp"
+#include "OGLRenderer.hpp"
 
-class Shader;
-class OGLRenderer;
+//class Shader;
+//class OGLRenderer;
 
 class ShaderNode : public Node
 {
 private:
-	OGLRenderer			&mRenderer;
-	Shader				*mShaderInfo;
+	OGLRenderer					&mRenderer;
+	Shader						*mShaderInfo;
+	OGLRenderer::Programs	mProgramType;
 
-	int 					mShaderID;
+	int 							mShaderID;
 
 public:
-							ShaderNode(OGLRenderer &renderer
-										  , Node::NodeType nodeType
-										  , int shaderID)
-							: Node(nodeType)
-							, mRenderer(renderer)
-							, mShaderID(shaderID)
-							{
+									ShaderNode(Node::NodeType nodeType
+												  , OGLRenderer &renderer
+												  , Shader *shdrInf
+												  , OGLRenderer::Programs progType
+												  , int shaderID)
+									: Node(nodeType)
+									, mRenderer(renderer)
+									, mShaderInfo(shdrInf)
+									, mProgramType(progType)
+									, mShaderID(shaderID)
+									{
 
-							};
+									};
 
-	virtual 				~ShaderNode(){};
+	virtual 						~ShaderNode(){};
 
-	virtual void 		draw(glm::mat4 VP);
+	virtual void 				draw(glm::mat4 V
+										 , glm::mat4 P);
 
-	int 					getShaderID()
-							{ return mShaderID; }
+	Shader*						getShaderInfo()
+									{ return mShaderInfo; }
 
-	Shader*				getShaderInfo()
-							{ return mShaderInfo; }
+	OGLRenderer::Programs	getProgramType()
+									{ return mProgramType; }
+
+	int 							getShaderID()
+									{ return mShaderID; }
 };
 
 #endif // SHADERNODE_HPP

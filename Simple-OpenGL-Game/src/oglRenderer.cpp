@@ -1,11 +1,13 @@
 #include <iostream>
 
+#include <glm/gtc/type_ptr.hpp>
+
 #include "OGLRenderer.hpp"
 #include "World.hpp"
 #include "ComputeMatricesFromInput.hpp"
 #include "SimpleShader.hpp"
 #include "Texture2DShader.hpp"
-//#include "DirectionalLightingShaderTex.hpp"
+#include "LightingShader.hpp"
 
 GLuint SamplerID;
 
@@ -65,19 +67,37 @@ void OGLRenderer::loadPrograms()
     };
 
 	// Create and compile our GLSL program from the shaders
-	mShadingProgramID[Texture2DProgram] = LoadShaders(shader_info_two);
+	mShadingProgramID[Tex2DProgram] = LoadShaders(shader_info_two);
 	mShaderInfo.push_back(Shader::ShaderUPtr(new Texture2DShader()));
 
-//	ShaderInfo shader_info_three[] =
+	ShaderInfo shader_info_three[] =
+    {
+        { GL_VERTEX_SHADER, "shaders/DirectionalLightingTex.vert" },
+        { GL_FRAGMENT_SHADER, "shaders/DirectionalLightingTex.frag" },
+        { GL_NONE, NULL }
+    };
+
+	// Create and compile our GLSL program from the shaders
+	mShadingProgramID[DirLightProgram] = LoadShaders(shader_info_three);
+	mShaderInfo.push_back(Shader::ShaderUPtr(new LightingShader()));
+
+	ShaderInfo shader_info_four[] =
+    {
+        { GL_VERTEX_SHADER, "shaders/PointLighting.vert" },
+        { GL_FRAGMENT_SHADER, "shaders/PointLighting.frag" },
+        { GL_NONE, NULL }
+    };
+
+//	ShaderInfo shader_info_four[] =
 //    {
 //        { GL_VERTEX_SHADER, "shaders/DirectionalLightingTex.vert" },
 //        { GL_FRAGMENT_SHADER, "shaders/DirectionalLightingTex.frag" },
 //        { GL_NONE, NULL }
 //    };
-//
-//	// Create and compile our GLSL program from the shaders
-//	mShadingProgramID[DirectionLightingProgram] = LoadShaders(shader_info_three);
-//	mShaderInfo.push_back(Shader::ShaderUPtr(new DirectionalLightingShaderTex()));
+
+	// Create and compile our GLSL program from the shaders
+	mShadingProgramID[PntLightProgram] = LoadShaders(shader_info_four);
+	mShaderInfo.push_back(Shader::ShaderUPtr(new LightingShader()));
 
 	allocProgramUniforms();
 }
@@ -178,31 +198,101 @@ bool OGLRenderer::loadWorldData(World *world)
 	glEnableVertexAttribArray(mShaderInfo.at(SimpleProgram)->Colour);
 
 	// Cube Texture2D shader VAO
-	glBindVertexArray(mVAO[CubeTexVAO]);
+//	glBindVertexArray(mVAO[CubeTexVAO]);
+//
+//	Texture2DShader *tex2DShader = dynamic_cast<Texture2DShader*>(mShaderInfo.at(Tex2DProgram).get());
+//
+//	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeVertBuf]);
+//	glVertexAttribPointer(tex2DShader->Position
+//								, 4
+//								, GL_FLOAT
+//								, GL_FALSE
+//								, 0
+//								, (void*)0);
+//
+//	glEnableVertexAttribArray(tex2DShader->Position);
+////	glEnableVertexAttribArray(0);
+//
+//	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeTexBuf]);
+//	glVertexAttribPointer(tex2DShader->UV
+//								, 2
+//								, GL_FLOAT
+//								, GL_TRUE
+//								, 0
+//								, (void*)0);
+//
+//	glEnableVertexAttribArray(tex2DShader->UV);
+//	glEnableVertexAttribArray(1);
 
-	Texture2DShader *tex2DShader = dynamic_cast<Texture2DShader*>(mShaderInfo.at(Texture2DProgram).get());
+	// Cube Directional light
+	glBindVertexArray(mVAO[CubeDirLightVAO]);
+
+	LightingShader *lightShader = dynamic_cast<LightingShader*>(mShaderInfo.at(DirLightProgram).get());
 
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeVertBuf]);
-	glVertexAttribPointer(tex2DShader->Position
+	glVertexAttribPointer(lightShader->Position
 								, 4
 								, GL_FLOAT
 								, GL_FALSE
 								, 0
 								, (void*)0);
 
-	glEnableVertexAttribArray(tex2DShader->Position);
-//	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(lightShader->Position);
 
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeTexBuf]);
-	glVertexAttribPointer(tex2DShader->UV
+	glVertexAttribPointer(lightShader->UV
 								, 2
 								, GL_FLOAT
 								, GL_TRUE
 								, 0
 								, (void*)0);
 
-	glEnableVertexAttribArray(tex2DShader->UV);
-//	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(lightShader->UV);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeNormBuf]);
+	glVertexAttribPointer(lightShader->Normal
+								, 3
+								, GL_FLOAT
+								, GL_TRUE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(lightShader->Normal);
+
+	// Cube Point light
+	glBindVertexArray(mVAO[CubeDirLightVAO]);
+
+	lightShader = dynamic_cast<LightingShader*>(mShaderInfo.at(PntLightProgram).get());
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeVertBuf]);
+	glVertexAttribPointer(lightShader->Position
+								, 4
+								, GL_FLOAT
+								, GL_FALSE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(lightShader->Position);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeTexBuf]);
+	glVertexAttribPointer(lightShader->UV
+								, 2
+								, GL_FLOAT
+								, GL_TRUE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(lightShader->UV);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeNormBuf]);
+	glVertexAttribPointer(lightShader->Normal
+								, 3
+								, GL_FLOAT
+								, GL_TRUE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(lightShader->Normal);
 
 	// Load Earth mesh data
 	OBJMesh *earthMesh = world->getObject(World::MeshType::Earth);
@@ -243,64 +333,132 @@ bool OGLRenderer::loadWorldData(World *world)
 	glEnableVertexAttribArray(mShaderInfo.at(SimpleProgram)->Colour);
 
 	// Earth Texture2D shader VAO
-	glBindVertexArray(mVAO[EarthTexVAO]);
+//	glBindVertexArray(mVAO[EarthTexVAO]);
 
-//	Texture2DShader *tex2DShader = dynamic_cast<Texture2DShader*>(mShaderInfo.at(Texture2DProgram).get());
+//	Texture2DShader *tex2DShader = dynamic_cast<Texture2DShader*>(mShaderInfo.at(Tex2DProgram).get());
 
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthVertBuf]);
-	glVertexAttribPointer(tex2DShader->Position
-								, 4
-								, GL_FLOAT
-								, GL_FALSE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(tex2DShader->Position);
-//	glEnableVertexAttribArray(0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthTexBuf]);
-	glVertexAttribPointer(tex2DShader->UV
-								, 2
-								, GL_FLOAT
-								, GL_TRUE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(tex2DShader->UV);
-//	glEnableVertexAttribArray(1);
-
-	// Earth Directional shader VAO
-//	glBindVertexArray(mVAO[EarthDirLightVAO]);
-//
-//	DirectionalLightingShaderTex *dirLightShader = dynamic_cast<DirectionalLightingShaderTex*>(mShaderInfo.at(DirectionLightingProgram).get());
-//
 //	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthVertBuf]);
-//	glVertexAttribPointer(dirLightShader->Position
+//	glVertexAttribPointer(tex2DShader->Position
 //								, 4
 //								, GL_FLOAT
 //								, GL_FALSE
 //								, 0
 //								, (void*)0);
 //
-//	glEnableVertexAttribArray(dirLightShader->Position);
+//	glEnableVertexAttribArray(tex2DShader->Position);
+////	glEnableVertexAttribArray(0);
 //
 //	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthTexBuf]);
-//	glVertexAttribPointer(dirLightShader->UV
+//	glVertexAttribPointer(tex2DShader->UV
 //								, 2
 //								, GL_FLOAT
 //								, GL_TRUE
 //								, 0
 //								, (void*)0);
 //
-//	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthNormBuf]);
-//	glVertexAttribPointer(dirLightShader->Normal
-//								, 3
-//								, GL_FLOAT
-//								, GL_TRUE
-//								, 0
-//								, (void*)0);
-//
-//	glEnableVertexAttribArray(dirLightShader->Normal);
+//	glEnableVertexAttribArray(tex2DShader->UV);
+//	glEnableVertexAttribArray(1);
+
+	// Earth Directional shader VAO
+	glBindVertexArray(mVAO[EarthDirLightVAO]);
+
+	lightShader = dynamic_cast<LightingShader*>(mShaderInfo.at(DirLightProgram).get());
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthVertBuf]);
+	glVertexAttribPointer(lightShader->Position
+								, 4
+								, GL_FLOAT
+								, GL_FALSE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(lightShader->Position);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthTexBuf]);
+	glVertexAttribPointer(lightShader->UV
+								, 2
+								, GL_FLOAT
+								, GL_TRUE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(lightShader->UV);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthNormBuf]);
+	glVertexAttribPointer(lightShader->Normal
+								, 3
+								, GL_FLOAT
+								, GL_TRUE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(lightShader->Normal);
+
+	// Data for Pnt light earth
+	glBindVertexArray(mVAO[EarthPntLightVAO]);
+
+	lightShader = dynamic_cast<LightingShader*>(mShaderInfo.at(PntLightProgram).get());
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthVertBuf]);
+	glVertexAttribPointer(lightShader->Position
+								, 4
+								, GL_FLOAT
+								, GL_FALSE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(lightShader->Position);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthTexBuf]);
+	glVertexAttribPointer(lightShader->UV
+								, 2
+								, GL_FLOAT
+								, GL_TRUE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(lightShader->UV);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthNormBuf]);
+	glVertexAttribPointer(lightShader->Normal
+								, 3
+								, GL_FLOAT
+								, GL_TRUE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(lightShader->Normal);
+
+	// Data for lights
+	std::vector<glm::vec4> lightColours;
+
+	for(int i = 0; i < earthMesh->vertNum; i++)
+		lightColours.push_back(glm::vec4(1, 1, 0.5, 1));
+
+   glBindBuffer(GL_ARRAY_BUFFER, mVBO[LightColBuf]);
+   glBufferData(GL_ARRAY_BUFFER, lightColours.size() * sizeof(glm::vec4), &lightColours[0], GL_STATIC_DRAW);
+
+	glBindVertexArray(mVAO[LightVAO]);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthVertBuf]);
+	glVertexAttribPointer(mShaderInfo.at(SimpleProgram)->Position
+								, 4
+								, GL_FLOAT
+								, GL_FALSE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(mShaderInfo.at(SimpleProgram)->Position);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[LightColBuf]);
+	glVertexAttribPointer(mShaderInfo.at(SimpleProgram)->Colour
+								, 4
+								, GL_FLOAT
+								, GL_TRUE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(mShaderInfo.at(SimpleProgram)->Colour);
 
 	glBindVertexArray(0);
 
@@ -316,51 +474,49 @@ void OGLRenderer::allocProgramUniforms()
 	mShaderInfo.at(SimpleProgram)->Position = glGetAttribLocation(mShadingProgramID[SimpleProgram], "vPosition");
 	mShaderInfo.at(SimpleProgram)->Colour = glGetAttribLocation(mShadingProgramID[SimpleProgram], "vColour");
 
-	Texture2DShader *tex2DShader = dynamic_cast<Texture2DShader*>(mShaderInfo.at(Texture2DProgram).get());
+	Texture2DShader *tex2DShader = dynamic_cast<Texture2DShader*>(mShaderInfo.at(Tex2DProgram).get());
 
 	// Texture shader uniforms
-	tex2DShader->MVP = glGetUniformLocation(mShadingProgramID[Texture2DProgram], "MVP");
-	tex2DShader->Sampler = glGetUniformLocation(mShadingProgramID[Texture2DProgram], "Tex2DSampler");
-//	glGetUniformLocation(mShadingProgramID[Texture2DProgram], "Tex2DSampler");
+	tex2DShader->MVP = glGetUniformLocation(mShadingProgramID[Tex2DProgram], "MVP");
+	tex2DShader->Sampler = glGetUniformLocation(mShadingProgramID[Tex2DProgram], "Tex2DSampler");
 
 	// Texture shader variables
-	tex2DShader->Position = glGetAttribLocation(mShadingProgramID[Texture2DProgram], "vPosition");
-	tex2DShader->UV = glGetAttribLocation(mShadingProgramID[Texture2DProgram], "vUV");
+	tex2DShader->Position = glGetAttribLocation(mShadingProgramID[Tex2DProgram], "vPosition");
+	tex2DShader->UV = glGetAttribLocation(mShadingProgramID[Tex2DProgram], "vUV");
 
-//	DirectionalLightingShaderTex *dirTexShader = dynamic_cast<DirectionalLightingShaderTex*>(mShaderInfo.at(DirectionLightingProgram).get());
-//
-//	// Directional lighting shader uniforms
-//	dirTexShader->MVP = glGetUniformLocation(mShadingProgramID[DirectionLightingProgram], "MVP");
-//	dirTexShader->MV = glGetUniformLocation(mShadingProgramID[DirectionLightingProgram], "MV");
-//	dirTexShader->LightPosition = glGetUniformLocation(mShadingProgramID[DirectionLightingProgram], "LightPosition");
-//	dirTexShader->Sampler = glGetUniformLocation(mShadingProgramID[DirectionLightingProgram], "Tex2DSampler");
-//
-//	// Directional lighting shader variables
-//	dirTexShader->Position = glGetAttribLocation(mShadingProgramID[DirectionLightingProgram], "vPosition");
-//	dirTexShader->UV = glGetAttribLocation(mShadingProgramID[DirectionLightingProgram], "vUV");
-//	dirTexShader->Normal = glGetAttribLocation(mShadingProgramID[DirectionLightingProgram], "vNormal");
+	LightingShader *lightShader = dynamic_cast<LightingShader*>(mShaderInfo.at(DirLightProgram).get());
 
-//	mShaders.at(Texture2DProgram) = text2DShader;
+	// Directional lighting shader uniforms
+	lightShader->MVP = glGetUniformLocation(mShadingProgramID[DirLightProgram], "MVP");
+//	dirLightShader->MV = glGetUniformLocation(mShadingProgramID[DirLightProgram], "MV");
+	lightShader->NormalMatrix = glGetUniformLocation(mShadingProgramID[DirLightProgram], "NormalMatrix");
+//	dirLightShader->LightPosition = glGetUniformLocation(mShadingProgramID[DirLightProgram], "LightPosition");
+	lightShader->LightDirection = glGetUniformLocation(mShadingProgramID[DirLightProgram], "LightDirection");
+//	dirLightShader->ViewDirection = glGetUniformLocation(mShadingProgramID[DirLightProgram], "ViewDirection");
+	lightShader->HalfVector = glGetUniformLocation(mShadingProgramID[DirLightProgram], "HalfVector");
+	lightShader->Sampler = glGetUniformLocation(mShadingProgramID[DirLightProgram], "Tex2DSampler");
 
-//	std::cout <<  "Pos: " << mShaders.at(SimpleProgram).Position
-//				<< "\nCol: " << mShaders.at(SimpleProgram).Colour
-//				<<"\nMVP: " << mShaders.at(SimpleProgram).MVP << std::endl;
+	// Directional lighting shader variables
+	lightShader->Position = glGetAttribLocation(mShadingProgramID[DirLightProgram], "vPosition");
+	lightShader->UV = glGetAttribLocation(mShadingProgramID[DirLightProgram], "vUV");
+	lightShader->Normal = glGetAttribLocation(mShadingProgramID[DirLightProgram], "vNormal");
 
-//	// Vertex shader
-//	ShadingProgramID[SimpleProgram] = glGetUniformLocation( LightMultiProgramID, "MVPMatrix");
-//	LightMultiProgramMVMatrixID = glGetUniformLocation( LightMultiProgramID, "MVMatrix");
-//	LightMultiProgramNormMatrixID = glGetUniformLocation( LightMultiProgramID, "NormalMatrix");
-//
-//	// Fragment shader
-//	LightMultiProgramEyeDirectionID = glGetUniformLocation(LightMultiProgramID, "EyeDirection");
-//	LightMultiProgram2DSamplerID = glGetUniformLocation(LightMultiProgramID, "Tex2DSampler");
-//
-//	// Vertex shader
-//	GLint uniLoc = glGetUniformLocation(LightMultiProgramID, "Shininess");
-//	glUniform1f(uniLoc, Shininess);
-//
-//	uniLoc = glGetUniformLocation(LightMultiProgramID, "Strength");
-//	glUniform1f(uniLoc, Strength);
+//	lightShader = nullptr;
+	lightShader = dynamic_cast<LightingShader*>(mShaderInfo.at(PntLightProgram).get());
+
+	// Point lighting shader uniforms
+	lightShader->MVP = glGetUniformLocation(mShadingProgramID[PntLightProgram], "MVP");
+	lightShader->MV = glGetUniformLocation(mShadingProgramID[PntLightProgram], "MV");
+	lightShader->NormalMatrix = glGetUniformLocation(mShadingProgramID[PntLightProgram], "NormalMatrix");
+	lightShader->LightPosition = glGetUniformLocation(mShadingProgramID[PntLightProgram], "LightPosition");
+	lightShader->EyeDirection = glGetUniformLocation(mShadingProgramID[PntLightProgram], "EyeDirection");
+	lightShader->Sampler = glGetUniformLocation(mShadingProgramID[PntLightProgram], "Tex2DSampler");
+
+	// Pntectional lighting shader variables
+	lightShader->Position = glGetAttribLocation(mShadingProgramID[PntLightProgram], "vPosition");
+	lightShader->UV = glGetAttribLocation(mShadingProgramID[PntLightProgram], "vUV");
+	lightShader->Normal = glGetAttribLocation(mShadingProgramID[PntLightProgram], "vNormal");
+
 }
 
 void OGLRenderer::clearContext()
@@ -376,28 +532,81 @@ void OGLRenderer::setupShader(int shaderID)
 	glUseProgram(shaderID);
 }
 
-void OGLRenderer::draw(GLuint VAO
+void OGLRenderer::draw(glm::mat4 MVP
+							, glm::mat4 MV
+							, GLuint VAO
 							, GLuint EBO
 							, GLuint numElements
 							, GLuint texID
 							, GLenum texTarget
-							, GLint samplerID
-							, GLint MVPID
-							, glm::mat4 MVP)
+							, Shader *shdrInfo
+							, Programs progType)
 {
 	glBindVertexArray(VAO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
-	// If node uses texture i.e sampler uniform has been assigned
-	if(samplerID > 0)
+	switch(progType)
 	{
-		glUniform1i(samplerID, texID - 1);
-		glActiveTexture(texTarget);
-		glBindTexture(GL_TEXTURE_2D, texID);
+		case SimpleProgram:
+		{
+			SimpleShader *shdr = dynamic_cast<SimpleShader*>(mShaderInfo.at(SimpleProgram).get());
+			glUniformMatrix4fv(shdr->MVP, 1, GL_FALSE, &MVP[0][0]);
+			break;
+		}
+		case Tex2DProgram:
+		{
+			Texture2DShader *shdr = dynamic_cast<Texture2DShader*>(mShaderInfo.at(Tex2DProgram).get());
+			glUniformMatrix4fv(shdr->MVP, 1, GL_FALSE, &MVP[0][0]);
+
+			glUniform1i(shdr->Sampler, texID - 1);
+			glActiveTexture(texTarget);
+			glBindTexture(GL_TEXTURE_2D, texID);
+
+			break;
+		}
+		case DirLightProgram:
+		{
+			LightingShader *shdr = dynamic_cast<LightingShader*>(mShaderInfo.at(DirLightProgram).get());
+			glUniformMatrix4fv(shdr->MVP, 1, GL_FALSE, &MVP[0][0]);
+
+			glm::mat3 normMatrix(MV);
+			glUniformMatrix3fv(shdr->NormalMatrix, 1, GL_FALSE, &normMatrix[0][0]);
+
+			glm::vec3 lightDirection(glm::normalize(MV * glm::vec4(-*mDirLightSource, 0)));
+			glUniform3fv(shdr->LightDirection, 1, glm::value_ptr(lightDirection));
+
+			glm::vec3 eyeDir = glm::vec3(MV * glm::vec4(getViewDirection(), 0));
+
+			glm::vec3 halfVec = glm::normalize(eyeDir + lightDirection);
+			glUniform3fv(shdr->HalfVector, 1, &halfVec[0]);
+
+			glUniform1i(shdr->Sampler, texID - 1);
+			glActiveTexture(texTarget);
+			glBindTexture(GL_TEXTURE_2D, texID);
+
+			break;
+		}
+		case PntLightProgram:
+		{
+			LightingShader *shdr = dynamic_cast<LightingShader*>(mShaderInfo.at(PntLightProgram).get());
+			glUniformMatrix4fv(shdr->MVP, 1, GL_FALSE, &MVP[0][0]);
+			glUniformMatrix4fv(shdr->MV, 1, GL_FALSE, &MV[0][0]);
+
+			glm::mat3 normMatrix(MV);
+			glUniformMatrix3fv(shdr->NormalMatrix, 1, GL_FALSE, &normMatrix[0][0]);
+
+			glUniform3fv(shdr->LightPosition, 1, glm::value_ptr(MV * glm::vec4(-mPntLightSources->at(0), 1)));
+			glUniform3fv(shdr->EyeDirection, 1, glm::value_ptr(MV * glm::vec4(getViewDirection(), 0)));
+
+			glUniform1i(shdr->Sampler, texID - 1);
+			glActiveTexture(texTarget);
+			glBindTexture(GL_TEXTURE_2D, texID);
+
+			break;
+		}
+		default: break;
 	}
 
-	glUniformMatrix4fv(MVPID, 1, GL_FALSE, &MVP[0][0]);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glDrawElements(GL_TRIANGLES, numElements, GL_UNSIGNED_SHORT, NULL);
 }
 
@@ -437,7 +646,7 @@ OGLRenderer::WindowUPtr OGLRenderer::createWindow()
 
 void OGLRenderer::calcVPMatrix()
 {
-	glm::mat4 P = getProjectionMatrix();
-	glm::mat4 V = getViewMatrix();
-	mVPMatrix = P * V;
+	mPMatrix = getProjectionMatrix();
+	mVMatrix = getViewMatrix();
+//	mVPMatrix = mPMatrix * mVMatrix;
 }
