@@ -18,7 +18,7 @@ void main()
 {
 	vec4 texColour = texture2D(Tex2DSampler, UV);
 	vec3 Ambient = vec3(0.1, 0.1, 0.1);
-	vec3 LightColour = vec3(0.7, 0.7, 0.7);
+	vec3 LightColour = vec3(0.9, 0.9, 0.9);
 
 	float Shininess = 20;
 	float Strength = 1;

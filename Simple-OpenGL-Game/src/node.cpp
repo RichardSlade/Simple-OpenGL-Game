@@ -1,20 +1,25 @@
 #include <iostream>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "Node.hpp"
 
-void Node::draw(glm::mat4 V
-					, glm::mat4 P)
+void Node::draw()
 {
-//	std::cout << "Draw ROOT" << std::endl;
-
 	for(unsigned int i = 0; i < mChildren.size(); i++)
-		mChildren.at(i)->draw(V, P);
+		mChildren.at(i)->draw();
+}
+
+void Node::drawShadowMap()
+{
+	for(unsigned int i = 0; i < mChildren.size(); i++)
+		mChildren.at(i)->drawShadowMap();
 }
 
 void Node::attachChild(NodeUPtr node)
 {
 	node->setParent(this);
-//	node->setShaderID(mNodeShaderID);
 	mChildren.push_back(std::move(node));
 }
 

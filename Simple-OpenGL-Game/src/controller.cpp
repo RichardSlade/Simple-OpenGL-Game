@@ -4,8 +4,6 @@
 
 #include "Controller.hpp"
 #include "ComputeMatricesFromInput.hpp"
-//#include "OGLRenderer.hpp"
-//#include "World.hpp"
 
 const sf::Time Controller::mFPS = sf::seconds(1.f / 60.f);
 
@@ -58,7 +56,7 @@ void Controller::run()
 			countDown = mFPS;
 			computeMatricesFromInput(mWindow.get(), mFPS);
 
-			mOGLRenderer.calcVPMatrix();
+			mOGLRenderer.setPlayerVPMatrices();
 		}
 
 		mWindow->clear();

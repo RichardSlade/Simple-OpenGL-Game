@@ -33,8 +33,9 @@ public:
 
 	virtual 						~ShaderNode(){};
 
-	virtual void 				draw(glm::mat4 V
-										 , glm::mat4 P);
+	virtual void 				draw();
+
+	virtual void 				drawShadowMap();
 
 	Shader*						getShaderInfo()
 									{ return mShaderInfo; }

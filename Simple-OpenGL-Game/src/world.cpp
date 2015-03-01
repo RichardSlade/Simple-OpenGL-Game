@@ -1,10 +1,14 @@
 #include <iostream>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "World.hpp"
 #include "OGLRenderer.hpp"
 //#include "Texture2DShader.hpp"
 //#include "DirLightShader.hpp"
 #include "SceneNode.hpp"
+#include "ComputeMatricesFromInput.hpp"
 
 World::World(OGLRenderer &renderer)
 : mRenderer(renderer)
@@ -50,7 +54,7 @@ void World::buildWorld()
 {
 	int shaderCount = mRenderer.getShaderCount();
 
-	for(int i = 0; i < shaderCount; i++)
+	for(int i = 0; i < shaderCount - 2; i++)
 	{
 		std::unique_ptr<ShaderNode> shaderNode(new ShaderNode(Node::NodeType::ShdrNode
 																			 , mRenderer
@@ -62,7 +66,7 @@ void World::buildWorld()
 		mSceneGraph.attachChild(std::move(shaderNode));
 	}
 
-	glm::vec3 pos(-10, 20, 10);
+	glm::vec3 pos(-20, 10, 10);
 	glm::vec3 lightScale(2.f, 2.f, 2.f);
 
 	// Create directional light source
@@ -75,40 +79,43 @@ void World::buildWorld()
 
 	lightScale = glm::vec3(0.25, 0.25, 0.25);
 
+//	mLightProjMatrix = glm::ortho<float>(-10,10,-10,10,-10,20);
+	mLightProjMatrix = glm::perspective(45.f, 4.0f / 3.0f, 0.1f, 100.0f);
+	mLightViewMatrix = glm::lookAt(mDirLightSource, -mDirLightSource, glm::vec3(0,1,0));
+	mRenderer.setLightVPMatrices(mLightViewMatrix
+											, mLightProjMatrix);
+
 	// Create point light sources
-	for(int i = 0; i < 1; i++)
-	{
-		pos = glm::vec3(i, 40, 10);
+//	for(int i = 0; i < 1; i++)
+//	{
+//		pos = glm::vec3(i, 40, 10);
+//
+//		mPntLightSources.push_back(pos);
+//
+//		createObject(LightObj
+//						, ShaderNodeTypes::SimpleShaderNode
+//						, pos
+//						, lightScale);
+//	}
 
-		mPntLightSources.push_back(pos);
+//	createObject(SpherePntLightObj
+//					, ShaderNodeTypes::PntLightShaderNode
+//					, glm::vec3(0, 1, 0));
 
-		createObject(LightObj
-						, ShaderNodeTypes::SimpleShaderNode
-						, pos
-						, lightScale);
-	}
+	// Floor
+//	createObject(FloorObj
+////					, ShaderNodeTypes::SimpleShaderNode
+//					, ShaderNodeTypes::ShadowShaderNode
+//					, glm::vec3(0));
 
 	// Create objects
-//	createObject(CubeColObj
-//					, ShaderNodeTypes::SimpleShaderNode
-//					, glm::vec3(4, 0, 0));
-//
 	createObject(CubeDirLightObj
 					, ShaderNodeTypes::DirLightShaderNode
-					, glm::vec3(4, 0, 0));
-
-//	createObject(SphereColObj
-//					, ShaderNodeTypes::SimpleShaderNode
-//					, glm::vec3(0, 0, 0));
+					, glm::vec3(4, 1, 0));
 
 	createObject(SphereDirLightObj
 					, ShaderNodeTypes::DirLightShaderNode
-					, glm::vec3(-4, 0, 0));
-
-	createObject(SpherePntLightObj
-					, ShaderNodeTypes::PntLightShaderNode
-					, glm::vec3(0, 0, 0));
-
+					, glm::vec3(-4, 1, 0));
 }
 
 void World::createObject(ObjectTypes objType
@@ -121,24 +128,12 @@ void World::createObject(ObjectTypes objType
 	// Initialise object with requested attributes
 	switch(objType)
 	{
-		case CubeColObj:
-		{
-			obj = std::unique_ptr<SceneNode>(new SceneNode(Node::NodeType::ScNode
-																		, mRenderer
-																		, mSceneGraphShaderNodes.at(objShdr)
-																		, objPos
-																		, objScale
-																		, mRenderer.getVAO(OGLRenderer::VertexArrays::CubeSimpleVAO)
-																		, mRenderer.getEBO(OGLRenderer::ElementArrayBuffers::CubeEBO)
-																		, mObjectMeshes.at(MeshType::Cube)->elementNum));
-			break;
-		}
 		case CubeDirLightObj:
 		case CubePntLightObj:
 		{
 			OGLRenderer::VertexArrays vao;
 
-			if(objType == OGLRenderer::Programs::DirLightProgram)
+			if(objType == CubeDirLightObj)
 				vao = OGLRenderer::VertexArrays::CubeDirLightVAO;
 			else
 				vao = OGLRenderer::VertexArrays::CubePntLightVAO;
@@ -148,7 +143,8 @@ void World::createObject(ObjectTypes objType
 																		, mSceneGraphShaderNodes.at(objShdr)
 																		, objPos
 																		, objScale
-																		, vao
+																		, mRenderer.getVAO(vao)
+																		, mRenderer.getVAO(OGLRenderer::VertexArrays::CubeShadowVAO)
 																		, mRenderer.getEBO(OGLRenderer::ElementArrayBuffers::CubeEBO)
 																		, mObjectMeshes.at(MeshType::Cube)->elementNum
 																		, mRenderer.getTex(OGLRenderer::Textures::WoodBoxTex)
@@ -156,43 +152,24 @@ void World::createObject(ObjectTypes objType
 
 			break;
 		}
-		case SphereColObj:
-		{
-			obj = std::unique_ptr<SceneNode>(new SceneNode(Node::NodeType::ScNode
-																		, mRenderer
-																		, mSceneGraphShaderNodes.at(objShdr)
-																		, objPos
-																		, objScale
-																		, mRenderer.getVAO(OGLRenderer::VertexArrays::EarthSimpleVAO)
-																		, mRenderer.getEBO(OGLRenderer::ElementArrayBuffers::EarthEBO)
-																		, mObjectMeshes.at(MeshType::Earth)->elementNum));
-
-			break;
-		}
 		case SphereDirLightObj:
-		{
-			obj = std::unique_ptr<SceneNode>(new SceneNode(Node::NodeType::ScNode
-																		, mRenderer
-																		, mSceneGraphShaderNodes.at(objShdr)
-																		, objPos
-																		, objScale
-																		, mRenderer.getVAO(OGLRenderer::VertexArrays::EarthDirLightVAO)
-																		, mRenderer.getEBO(OGLRenderer::ElementArrayBuffers::EarthEBO)
-																		, mObjectMeshes.at(MeshType::Earth)->elementNum
-																		, mRenderer.getTex(OGLRenderer::Textures::BlueMarbleTex)
-																		, mRenderer.getTexTarget(OGLRenderer::Textures::BlueMarbleTex)));
-
-			break;
-		}
 		case SpherePntLightObj:
 		{
+			OGLRenderer::VertexArrays vao;
+
+			if(objType == SphereDirLightObj)
+				vao = OGLRenderer::VertexArrays::EarthDirLightVAO;
+			else
+				vao = OGLRenderer::VertexArrays::EarthPntLightVAO;
+
 			obj = std::unique_ptr<SceneNode>(new SceneNode(Node::NodeType::ScNode
 																		, mRenderer
 																		, mSceneGraphShaderNodes.at(objShdr)
 																		, objPos
 																		, objScale
-																		, mRenderer.getVAO(OGLRenderer::VertexArrays::EarthPntLightVAO)
-																		, mRenderer.getEBO(OGLRenderer::ElementArrayBuffers::EarthEBO)
+																		, mRenderer.getVAO(vao)
+																		, mRenderer.getVAO(OGLRenderer::VertexArrays::EarthShadowVAO)
+																		, mRenderer.getEBO(OGLRenderer::ElementArrayBuffers::SphereEBO)
 																		, mObjectMeshes.at(MeshType::Earth)->elementNum
 																		, mRenderer.getTex(OGLRenderer::Textures::BlueMarbleTex)
 																		, mRenderer.getTexTarget(OGLRenderer::Textures::BlueMarbleTex)));
@@ -202,21 +179,33 @@ void World::createObject(ObjectTypes objType
 		case LightObj:
 		{
 			obj = std::unique_ptr<SceneNode>(new SceneNode(Node::NodeType::ScNode
-															, mRenderer
-															, mSceneGraphShaderNodes.at(objShdr)
-															, objPos
-															, objScale
-															, mRenderer.getVAO(OGLRenderer::VertexArrays::LightVAO)
-															, mRenderer.getEBO(OGLRenderer::ElementArrayBuffers::EarthEBO)
-															, mObjectMeshes.at(MeshType::Earth)->elementNum));
+																		, mRenderer
+																		, mSceneGraphShaderNodes.at(objShdr)
+																		, objPos
+																		, objScale
+																		, mRenderer.getVAO(OGLRenderer::VertexArrays::LightVAO)
+																		, 0
+																		, mRenderer.getEBO(OGLRenderer::ElementArrayBuffers::SphereEBO)
+																		, mObjectMeshes.at(MeshType::Earth)->elementNum));
+
+			break;
+		}
+		case FloorObj:
+		{
+			obj = std::unique_ptr<SceneNode>(new SceneNode(Node::NodeType::ScNode
+																		, mRenderer
+																		, mSceneGraphShaderNodes.at(objShdr)
+																		, objPos
+																		, objScale
+																		, mRenderer.getVAO(OGLRenderer::VertexArrays::PlaneVAO)
+																		, mRenderer.getVAO(OGLRenderer::VertexArrays::PlaneShadowVAO)
+																		, mRenderer.getEBO(OGLRenderer::ElementArrayBuffers::PlaneEBO)
+																		, 6));
 
 			break;
 		}
 		default: break;
 	}
-
-	// Set position of object
-//	obj->setPosition(objPos);
 
 	// Store in scene graph
 	mSceneGraphShaderNodes.at(objShdr)->attachChild(std::move(obj));
@@ -224,8 +213,40 @@ void World::createObject(ObjectTypes objType
 
 void World::drawWorld()
 {
-   mRenderer.clearContext();
+//	glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10,10,-10,10,-10,20);
+//	glm::mat4 depthProjectionMatrix = glm::frustrum<float>(-1.0f,1.0f,-10,10,-10,20);
+//	glm::mat4 depthProjectionMatrix = glm::mat4(1);
+//	glm::mat4 depthProjectionMatrix = glm::;
+//	glm::mat4 depthViewMatrix = glm::lookAt(getViewDirection(), -mDirLightSource, glm::vec3(0,1,0));
+//	glm::mat4 depthViewMatrix = glm::lookAt(-mDirLightSource, glm::vec3(0,0,0), glm::vec3(0,1,0));
 
-	mSceneGraph.draw(mRenderer.getVMatrix()
-							, mRenderer.getPMatrix());
+//	glm::mat4 depthModelMatrix = glm::mat4(1);
+//	glm::mat4 depthModelMatrix = glm::translate(mDirLightSource);
+//	glm::mat4 depthMVP = getProjectionMatrix() * depthViewMatrix * depthModelMatrix;
+//	glm::mat4 depthMVP = depthProjectionMatrix * depthViewMatrix * depthModelMatrix;
+//	glm::mat4 depthMVP = glm::mat4(1);
+
+//   mRenderer.setupShadowDepthShader();
+
+	enum isDepthPass {Normal, Depth};
+
+	// Shadow map pass
+//	mRenderer.setupDepthPass(mLightViewMatrix
+//								, mLightProjMatrix);
+
+//	mRenderer.clearContext(isDepthPass::Depth);
+//	mRenderer.setupShader(mRenderer.getShaderProgramID(OGLRenderer::Programs::DepthProgram));
+
+//	mSceneGraph.drawShadowMap();
+
+//	mRenderer.clearContext(isDepthPass::Normal);
+//	mRenderer.drawShadowMap();
+
+	// Now regular rendering pass
+//	mRenderer.clearContext(isDepthPass::Normal);
+
+//	mSceneGraph.draw();
+
+//	mSceneGraph.draw(mRenderer.getPlayerViewMatrix()
+//							, mRenderer.getPlayerProjMatrix());
 }

@@ -14,6 +14,7 @@
 
 #include "LoadShaders.h"
 #include "Shader.hpp"
+//#include "SimpleShader.hpp"
 
 class World;
 
@@ -24,20 +25,12 @@ public:
 
 	enum VertexArrays
 	{
-//		CubeSimpleVAO,
-//		CubeTexVAO,
+		CubeSimpleVAO,
+		CubeTexVAO,
 		CubeDirLightVAO,
-		CubePntLightVAO,
-		CubeShadowVAO,
-//		EarthSimpleVAO,
-//		EarthTexVAO,
+		EarthSimpleVAO,
+		EarthTexVAO,
 		EarthDirLightVAO,
-		EarthPntLightVAO,
-		EarthShadowVAO,
-		LightVAO,
-		PlaneVAO,
-		PlaneShadowVAO,
-		ShadowMapVAO,
 		NumVAO
 	};
 
@@ -49,19 +42,13 @@ public:
 		EarthVertBuf,
 		EarthNormBuf,
 		EarthTexBuf,
-		LightColBuf,
-		PlaneVertBuf,
-		PlaneColBuf,
-		QuadVertBuf,
-		QuadUVBuf,
 		NumVBO
 	};
 
 	enum ElementArrayBuffers
 	{
 		CubeEBO,
-		SphereEBO,
-		PlaneEBO,
+		EarthEBO,
 		NumEBO
 	};
 
@@ -69,19 +56,14 @@ public:
 	{
 		WoodBoxTex,
 		BlueMarbleTex,
-		DepthTex,
 		NumTex
 	};
 
 	enum Programs
 	{
 		SimpleProgram,
-		Tex2DProgram,
-		DirLightProgram,
-		PntLightProgram,
-		ShadowProgram,
-		DepthProgram,
-		DepthTexProgram,
+		Texture2DProgram,
+		DirectionLightingProgram,
 		NumPrograms
 	};
 
@@ -93,31 +75,17 @@ private:
 	GLuint 						mTex[NumTex];
 	GLenum 						mTexTargets[NumTex];
 
-	GLuint						mFBO;
-
 	GLuint						mShadingProgramID[NumPrograms];
 
-	glm::mat4 					mPlayerViewMatrix;
-	glm::mat4 					mPlayerProjMatrix;
-
-	glm::mat4 					mLightViewMatrix;
-	glm::mat4 					mLightProjMatrix;
-//	glm::mat4 					mDepthMVP;
-
-	glm::vec3 					*mDirLightSource;
-	std::vector<glm::vec3> 	*mPntLightSources;
+	glm::mat4					mVPMatrix;
 
 	std::vector<Shader::ShaderUPtr> mShaderInfo;
 
 	void 						loadPrograms();
-	bool						loadTextures(sf::Vector2u windowSize);
+	bool						loadTextures();
 	void						allocProgramUniforms();
 
-	bool 						checkFramebuffer(GLenum status);
-
 	void 						cleanUp();
-
-	unsigned int  			texTargetToUInt(GLenum texTarget);
 
 public:
 								OGLRenderer(){};
@@ -127,32 +95,20 @@ public:
 	bool 						init(sf::RenderWindow *window);
 	bool 						loadWorldData(World *world);
 
-	void 						clearContext(bool isShadowPass);
-
-	void 						setupDepthPass(glm::mat4 lightView
-											, glm::mat4 lightProj);
+	void 						clearContext();
 
 	void 						setupShader(int shaderID);
 
-	void 						drawShadowMap();
-
-	void						drawShadow(glm::mat4 MVP
-											 , GLuint VAO
-											 , GLuint EBO
-											 , GLuint numElements);
-
-	void 						draw(glm::mat4 M
-									, GLuint VAO
+	void 						draw(GLuint VAO
 									, GLuint EBO
 									, GLuint numElements
 									, GLuint texBuffer
 									, GLenum texTarget
-									, Shader *shdrInfo
-									, Programs progType);
+									, GLint samplerID
+									, GLint MVPID
+									, glm::mat4 MVP);
 
-	void 						setPlayerVPMatrices();
-	void 						setLightVPMatrices(glm::mat4 lightView
-														, glm::mat4 lightProj);
+	void 						calcVPMatrix();
 
 	// Getters
 	GLuint 					getVAO(VertexArrays vao)
@@ -167,11 +123,8 @@ public:
 	GLenum 					getTexTarget(Textures tex)
 								{ return mTexTargets[tex]; }
 
-	glm::mat4 				getPlayerProjMatrix()
-								{ return mPlayerProjMatrix; }
-
-	glm::mat4 				getPlayerViewMatrix()
-								{ return mPlayerViewMatrix; }
+	glm::mat4 				getVPMatrix()
+								{ return mVPMatrix; }
 
 	GLuint					getShaderProgramID(int program)
 								{ return mShadingProgramID[program]; }
@@ -181,13 +134,6 @@ public:
 
 	unsigned int 			getShaderCount()
 								{ return mShaderInfo.size(); }
-
-	// Setters
-	void 						setDirLightSource(glm::vec3 *newDirLightSource)
-								{ mDirLightSource = newDirLightSource; }
-
-	void 						setPntLightSources(std::vector<glm::vec3> *newPntLightSources)
-								{ mPntLightSources = newPntLightSources; }
 };
 
 #endif // OGLRENDERER_HPP

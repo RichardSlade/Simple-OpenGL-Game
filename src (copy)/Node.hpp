@@ -13,7 +13,8 @@ public:
 
 	enum NodeType
 	{
-		ShdrNode,
+		SimpleShaderNode,
+		Texture2DNode,
 		Root,
 		ScNode,
 		NumNodeTypes
@@ -25,6 +26,8 @@ protected:
 	Node*									mParent;
 	std::vector<NodeUPtr> 			mChildren;
 
+//	virtual void 						drawCurrent(glm::mat4 VP){};
+
 public:
 										Node(NodeType nodeType)
 										: mType(nodeType)
@@ -34,9 +37,7 @@ public:
 
 	virtual 							~Node(){};
 
-	virtual void 					draw();
-
-	virtual void 					drawShadowMap();
+	virtual void 					draw(glm::mat4 VP);
 
 	void 								attachChild(NodeUPtr node);
 	void 								removeChild();

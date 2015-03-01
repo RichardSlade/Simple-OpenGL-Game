@@ -23,7 +23,7 @@
 			<Target title="Release">
 				<Option output="bin/Release/Simple-OpenGL-Game" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
-				<Option type="1" />
+				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
@@ -46,23 +46,36 @@
 			<Add directory="../../../Libraries/SFML-2.2/lib" />
 			<Add directory="../../../Libraries/glew-1.10.0/lib" />
 		</Linker>
+		<Unit filename="shaders/DepthRTT.frag" />
+		<Unit filename="shaders/DepthRTT.vert" />
+		<Unit filename="shaders/DepthTex.frag" />
+		<Unit filename="shaders/DepthTex.vert" />
 		<Unit filename="shaders/DirectionalLightingTex.frag" />
 		<Unit filename="shaders/DirectionalLightingTex.vert" />
+		<Unit filename="shaders/PointLighting.frag" />
+		<Unit filename="shaders/PointLighting.vert" />
+		<Unit filename="shaders/ShadowMap.frag" />
+		<Unit filename="shaders/ShadowMap.vert" />
+		<Unit filename="shaders/ShadowMapping_SimpleVersion.frag" />
+		<Unit filename="shaders/ShadowMapping_SimpleVersion.vert" />
 		<Unit filename="shaders/Simple.frag" />
 		<Unit filename="shaders/Simple.vert" />
 		<Unit filename="shaders/Texturing2D.frag" />
 		<Unit filename="shaders/Texturing2D.vert" />
 		<Unit filename="src/ComputeMatricesFromInput.hpp" />
 		<Unit filename="src/Controller.hpp" />
-		<Unit filename="src/DirLightShader.hpp" />
+		<Unit filename="src/LightSource.hpp" />
+		<Unit filename="src/LightingShader.hpp" />
 		<Unit filename="src/LoadShaders.h" />
 		<Unit filename="src/Mesh.hpp" />
 		<Unit filename="src/Node.hpp" />
 		<Unit filename="src/OBJMesh.hpp" />
 		<Unit filename="src/OGLRenderer.hpp" />
+		<Unit filename="src/PointSource.hpp" />
 		<Unit filename="src/SceneNode.hpp" />
 		<Unit filename="src/Shader.hpp" />
 		<Unit filename="src/ShaderNode.hpp" />
+		<Unit filename="src/ShadowShader.hpp" />
 		<Unit filename="src/SimpleShader.hpp" />
 		<Unit filename="src/Texture2DShader.hpp" />
 		<Unit filename="src/World.hpp" />

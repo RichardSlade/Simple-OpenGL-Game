@@ -19,27 +19,12 @@ public:
 		NumMeshes
 	};
 
-	enum ShaderNodeTypes
+	enum ShaderNodes
 	{
 		SimpleShaderNode,
 		Tex2DShaderNode,
 		DirLightShaderNode,
-		PntLightShaderNode,
-		ShadowShaderNode,
-		NumShaderNodeTypes
-	};
-
-	enum ObjectTypes
-	{
-		CubeColObj,
-		CubeDirLightObj,
-		CubePntLightObj,
-		SphereColObj,
-		SphereDirLightObj,
-		SpherePntLightObj,
-		LightObj,
-		FloorObj,
-		NumObjectTypes
+		NumShaderNodes
 	};
 
 private:
@@ -50,24 +35,13 @@ private:
 	Node									mSceneGraph;
 	std::vector<ShaderNode*>		mSceneGraphShaderNodes;
 
-	glm::vec3						mDirLightSource;
-	std::vector<glm::vec3>		mPntLightSources;
-
-	glm::mat4 						mLightViewMatrix;
-	glm::mat4 						mLightProjMatrix;
-
 	void								loadObjects();
 	void 								buildWorld();
-
-	void 								createObject(ObjectTypes objType
-														, ShaderNodeTypes objShdr
-														, glm::vec3 objPos
-														, glm::vec3 objScale = glm::vec3(1));
 
 public:
 										World(OGLRenderer &renderer);
 
-	void 								drawWorld();
+	void 								display();
 
 	// Getters
 	OBJMesh*							getObject(MeshType type)

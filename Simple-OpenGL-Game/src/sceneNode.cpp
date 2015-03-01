@@ -3,8 +3,6 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-//#include <SFML/OpenGL.hpp>
-
 #include <GL/glew.h>
 
 #include "SceneNode.hpp"
@@ -16,6 +14,7 @@ SceneNode::SceneNode(Node::NodeType nodeType
 							, glm::vec3 pos
 							, glm::vec3 scale
 							, GLuint VAO
+							, GLuint shadowVAO
 							, GLuint EBO
 							, GLuint numEle
 							, GLuint texID
@@ -24,6 +23,7 @@ SceneNode::SceneNode(Node::NodeType nodeType
 , mOGLRenderer(renderer)
 , mShaderNode(shdrNode)
 , mVAO(VAO)
+, mShadowVAO(shadowVAO)
 , mEBO(EBO)
 , mNumElements(numEle)
 , mTexID(texID)
@@ -48,37 +48,35 @@ SceneNode::SceneNode(Node::NodeType nodeType
 	mModelMatrix = mRotationMatrix * mScalingMatrix * mTranslationMatrix;
 }
 
-void SceneNode::drawCurrent(glm::mat4 V
-									, glm::mat4 P)
+void SceneNode::drawCurrent()
 {
-//	std::cout << "Draw SCENE NODE" << std::endl;
-
-	glm::mat4 MV = V * mModelMatrix;
-	glm::mat4 MVP = P * V * mModelMatrix;
-
-//	glm::mat4 MVP = VP * glm::mat4(1);
-
-	mOGLRenderer.draw(MVP
-						 , MV
+	mOGLRenderer.draw(mModelMatrix
 						 , mVAO
 						 , mEBO
 						 , mNumElements
 						 , mTexID
 						 , mTexTarget
 						 , mShaderNode->getShaderInfo()
-						 , mShaderNode->getProgramType()
-//						 , mSamplerID
-//						 , mMVPID
-						  );
+						 , mShaderNode->getProgramType());
 }
 
-void SceneNode::draw(glm::mat4 V
-							, glm::mat4 P)
+void SceneNode::draw()
 {
-	drawCurrent(V, P);
+	drawCurrent();
 
 	for(unsigned int i = 0; i < mChildren.size(); i++)
-		mChildren.at(i)->draw(V, P);
+		mChildren.at(i)->draw();
+}
+
+void SceneNode::drawShadowMap()
+{
+   mOGLRenderer.drawShadow(mModelMatrix
+									, mShadowVAO
+									, mEBO
+									, mNumElements);
+
+	for(unsigned int i = 0; i < mChildren.size(); i++)
+		mChildren.at(i)->drawShadowMap();
 }
 
 void SceneNode::setPosition(glm::vec3 pos)
@@ -93,5 +91,4 @@ void SceneNode::setPosition(glm::vec3 pos)
 
 //	mModelMatrix = mTranslationMatrix;
 }
-
 
