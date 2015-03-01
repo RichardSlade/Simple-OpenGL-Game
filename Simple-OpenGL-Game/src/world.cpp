@@ -54,7 +54,7 @@ void World::buildWorld()
 {
 	int shaderCount = mRenderer.getShaderCount();
 
-	for(int i = 0; i < shaderCount - 2; i++)
+	for(int i = 0; i < shaderCount; i++)
 	{
 		std::unique_ptr<ShaderNode> shaderNode(new ShaderNode(Node::NodeType::ShdrNode
 																			 , mRenderer
@@ -103,10 +103,10 @@ void World::buildWorld()
 //					, glm::vec3(0, 1, 0));
 
 	// Floor
-//	createObject(FloorObj
-////					, ShaderNodeTypes::SimpleShaderNode
-//					, ShaderNodeTypes::ShadowShaderNode
-//					, glm::vec3(0));
+	createObject(FloorObj
+//					, ShaderNodeTypes::SimpleShaderNode
+					, ShaderNodeTypes::ShadowShaderNode
+					, glm::vec3(0));
 
 	// Create objects
 	createObject(CubeDirLightObj
@@ -234,19 +234,16 @@ void World::drawWorld()
 //	mRenderer.setupDepthPass(mLightViewMatrix
 //								, mLightProjMatrix);
 
-//	mRenderer.clearContext(isDepthPass::Depth);
-//	mRenderer.setupShader(mRenderer.getShaderProgramID(OGLRenderer::Programs::DepthProgram));
+	mRenderer.clearContext(isDepthPass::Depth);
+	mRenderer.setupShader(mRenderer.getShaderProgramID(OGLRenderer::Programs::DepthProgram));
 
-//	mSceneGraph.drawShadowMap();
+	mSceneGraph.drawShadowMap();
 
 //	mRenderer.clearContext(isDepthPass::Normal);
-//	mRenderer.drawShadowMap();
+	mRenderer.drawShadowMap();
 
 	// Now regular rendering pass
 //	mRenderer.clearContext(isDepthPass::Normal);
 
 //	mSceneGraph.draw();
-
-//	mSceneGraph.draw(mRenderer.getPlayerViewMatrix()
-//							, mRenderer.getPlayerProjMatrix());
 }

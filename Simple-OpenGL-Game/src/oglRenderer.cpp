@@ -95,25 +95,27 @@ void OGLRenderer::loadPrograms()
 
 	ShaderInfo shader_info_five[] =
 	{
-        { GL_VERTEX_SHADER, "shaders/DepthRTT.vert" },
-        { GL_FRAGMENT_SHADER, "shaders/DepthRTT.frag" },
-        { GL_NONE, NULL }
-	};
-
-	// Create and compile our GLSL program from the shaders
-	mShadingProgramID[DepthProgram] = LoadShaders(shader_info_five);
-	mShaderInfo.push_back(Shader::ShaderUPtr(new ShadowShader()));
-
-	ShaderInfo shader_info_six[] =
-	{
         { GL_VERTEX_SHADER, "shaders/ShadowMapping_SimpleVersion.vert" },
         { GL_FRAGMENT_SHADER, "shaders/ShadowMapping_SimpleVersion.frag" },
         { GL_NONE, NULL }
 	};
 
 	// Create and compile our GLSL program from the shaders
-	mShadingProgramID[ShadowProgram] = LoadShaders(shader_info_six);
+	mShadingProgramID[ShadowProgram] = LoadShaders(shader_info_five);
 	mShaderInfo.push_back(Shader::ShaderUPtr(new ShadowShader()));
+
+	ShaderInfo shader_info_six[] =
+	{
+        { GL_VERTEX_SHADER, "shaders/DepthRTT.vert" },
+        { GL_FRAGMENT_SHADER, "shaders/DepthRTT.frag" },
+        { GL_NONE, NULL }
+	};
+
+	// Create and compile our GLSL program from the shaders
+	mShadingProgramID[DepthProgram] = LoadShaders(shader_info_six);
+	mShaderInfo.push_back(Shader::ShaderUPtr(new ShadowShader()));
+
+
 
 	ShaderInfo shader_info_seven[] =
 	{
@@ -124,7 +126,10 @@ void OGLRenderer::loadPrograms()
 
 	// Create and compile our GLSL program from the shaders
 	mShadingProgramID[DepthTexProgram] = LoadShaders(shader_info_seven);
-	mShaderInfo.push_back(Shader::ShaderUPtr(new ShadowShader()));
+//	mShaderInfo.push_back(Shader::ShaderUPtr(new ShadowShader()));
+
+	std::cout << "Depth Tex ID: " << mShadingProgramID[DepthTexProgram] << std::endl;
+
 
 	allocProgramUniforms();
 }
@@ -202,8 +207,8 @@ bool OGLRenderer::loadTextures(sf::Vector2u windowSize)
 	glGenFramebuffers(1, &mFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
 
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
+//	glDrawBuffer(GL_NONE);
+//	glReadBuffer(GL_NONE);
 
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT
 								, mTex[DepthTex], 0);
@@ -530,28 +535,42 @@ bool OGLRenderer::loadWorldData(World *world)
 
 	GLfloat quadVerts[] =
 	{
-		0.f, 0.f, 0.f, 1.f,
-		0.f, 1.f, 0.f, 1.f,
-		1.f, 0.f, 0.f, 1.f,
+		-1.f, -1.f, 0.f, 1.f,
+		1.f, -1.f, 0.f, 1.f,
+		-1.f, 1.f, 0.f, 1.f,
 
-		0.f, 1.f, 0.f, 1.f,
-		1.f, 0.f, 0.f, 1.f,
+		-1.f, 1.f, 0.f, 1.f,
+		1.f, -1.f, 0.f, 1.f,
 		1.f, 1.f, 0.f, 1.f,
 	};
 
 	GLfloat quadUV[] =
 	{
-		0.f, 0.f,
-		0.f, 1.f,
-		1.f, 0.f,
+		-1.f, -1.f,
+		1.f, -1.f,
+		-1.f, 1.f,
 
-		0.f, 1.f,
-		1.f, 0.f,
+		-1.f, 1.f,
+		1.f, -1.f,
 		1.f, 1.f,
+	};
+
+	GLfloat quadCol[] =
+	{
+		0.f, 0.f, 1.f, 1.f,
+		0.f, 0.f, 1.f, 1.f,
+		0.f, 0.f, 1.f, 1.f,
+
+		0.f, 1.f, 0.f, 1.f,
+		0.f, 1.f, 0.f, 1.f,
+		0.f, 1.f, 0.f, 1.f,
 	};
 
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO[QuadVertBuf]);
 	glBufferData(GL_ARRAY_BUFFER, 4 * 6 * sizeof(GLfloat), &quadVerts[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[QuadColBuf]);
+	glBufferData(GL_ARRAY_BUFFER, 4 * 6 * sizeof(GLfloat), &quadCol[0], GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO[QuadUVBuf]);
 	glBufferData(GL_ARRAY_BUFFER, 2 * 6 * sizeof(GLfloat), &quadUV[0], GL_STATIC_DRAW);
@@ -566,15 +585,25 @@ bool OGLRenderer::loadWorldData(World *world)
 
 	glEnableVertexAttribArray(0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[QuadUVBuf]);
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[QuadColBuf]);
 	glVertexAttribPointer(1
+								, 4
+								, GL_FLOAT
+								, GL_TRUE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[QuadUVBuf]);
+	glVertexAttribPointer(2
 								, 2
 								, GL_FLOAT
 								, GL_FALSE
 								, 0
 								, (void*)0);
 
-	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
 
 	glBindVertexArray(0);
 
@@ -633,13 +662,8 @@ void OGLRenderer::allocProgramUniforms()
 	lightShader->UV = glGetAttribLocation(mShadingProgramID[PntLightProgram], "vUV");
 	lightShader->Normal = glGetAttribLocation(mShadingProgramID[PntLightProgram], "vNormal");
 
-	// Depth programs
-	ShadowShader *shadowShader = dynamic_cast<ShadowShader*>(mShaderInfo.at(DepthProgram).get());
-
-	shadowShader->DepthMVP = glGetUniformLocation(mShadingProgramID[DepthProgram], "DepthMVP");
-	shadowShader->Position = glGetAttribLocation(mShadingProgramID[DepthProgram], "vPosition");
-
-	shadowShader = dynamic_cast<ShadowShader*>(mShaderInfo.at(ShadowProgram).get());
+	// Shadow program
+	ShadowShader *shadowShader = dynamic_cast<ShadowShader*>(mShaderInfo.at(ShadowProgram).get());
 
 	shadowShader->MVP = glGetUniformLocation(mShadingProgramID[ShadowProgram], "MVP");
 	shadowShader->DepthMVP = glGetUniformLocation(mShadingProgramID[ShadowProgram], "DepthBiasMVP");
@@ -647,8 +671,20 @@ void OGLRenderer::allocProgramUniforms()
 	shadowShader->ShadowSampler = glGetUniformLocation(mShadingProgramID[ShadowProgram], "ShadowSampler");
 
 	shadowShader->Position = glGetAttribLocation(mShadingProgramID[ShadowProgram], "vPosition");
+	// Depth programs
+	shadowShader = dynamic_cast<ShadowShader*>(mShaderInfo.at(DepthProgram).get());
+
+	shadowShader->DepthMVP = glGetUniformLocation(mShadingProgramID[DepthProgram], "DepthMVP");
+	shadowShader->Position = glGetAttribLocation(mShadingProgramID[DepthProgram], "vPosition");
+
+
 //	shadowShader->UV = glGetAttribLocation(mShadingProgramID[ShadowProgram], "vUV");
 //	shadowShader->Normal = glGetAttribLocation(mShadingProgramID[ShadowProgram], "vNormal");
+
+//	std::cout << "Depth Tex ID: " << mShadingProgramID[DepthTexProgram] << std::endl;
+
+//	GLuint tex2DsamplerID = glGetUniformLocation(mShadingProgramID[DepthTexProgram], "Tex2DSampler");
+//	GLuint tex2DsamplerID = glGetUniformLocation(mShadingProgramID[ShadowProgram], "ShadowSampler");
 
 }
 
@@ -737,17 +773,17 @@ unsigned int OGLRenderer::texTargetToUInt(GLenum texTarget)
 
 void OGLRenderer::clearContext(bool isShadowPass)
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	if(isShadowPass)
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFBO);
+//		glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
 
 	glClearColor(0.3f, 0.3f, 0.5f, 1.f);
    glEnable(GL_CULL_FACE);
 
    if(isShadowPass)
 	{
-		glCullFace(GL_FRONT | GL_BACK);
+//		glCullFace(GL_FRONT | GL_BACK);
 		glClear(GL_DEPTH_BUFFER_BIT);
 	}
 	else
@@ -766,16 +802,7 @@ void OGLRenderer::setupDepthPass(glm::mat4 lightView
 
 void OGLRenderer::setupShader(int shaderID)
 {
-
-//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glUseProgram(shaderID);
-
-//	glEnable(GL_CULL_FACE);
-//	glCullFace(GL_BACK);
-
-//	glClearColor(0.3f, 0.3f, 0.5f, 1.f);
-
-//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void OGLRenderer::drawShadowMap()
@@ -783,29 +810,38 @@ void OGLRenderer::drawShadowMap()
 	glUseProgram(mShadingProgramID[DepthTexProgram]);
 	glBindVertexArray(mVAO[ShadowMapVAO]);
 
-//	GLuint tex2DsamplerID = glGetUniformLocation(mShadingProgramID[DepthTexProgram], "Tex2DSampler");
+	GLuint tex2DsamplerID = glGetUniformLocation(mShadingProgramID[DepthTexProgram], "Tex2DSampler");
 
 //	glUniform1i(1, 2);
-//	glActiveTexture(mTexTargets[DepthTex]);
+	glUniform1i(tex2DsamplerID, texTargetToUInt(mTexTargets[DepthTex]));
+//	glUniform1i(tex2DsamplerID, texTargetToUInt(mTexTargets[WoodBoxTex]));
+	glActiveTexture(mTexTargets[DepthTex]);
+//	glActiveTexture(mTexTargets[WoodBoxTex]);
 //	glActiveTexture(GL_TEXTURE2);
-//	glBindTexture(GL_TEXTURE_2D, mTex[DepthTex]);
+//	glBindTexture(GL_TEXTURE_2D, mTex[WoodBoxTex]);
+	glBindTexture(GL_TEXTURE_2D, mTex[DepthTex]);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void OGLRenderer::drawShadow(glm::mat4 depthMVP
+void OGLRenderer::drawShadow(glm::mat4 M
 									 , GLuint VAO
 									 , GLuint EBO
 									 , GLuint numElements
 )
 {
 	glBindVertexArray(VAO);
+	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
+
+	glm::mat4 depthMVP = mPlayerProjMatrix * mPlayerViewMatrix * M;
 
 	ShadowShader* shadowShader = dynamic_cast<ShadowShader*>(mShaderInfo.at(DepthProgram).get());
 	glUniformMatrix4fv(shadowShader->DepthMVP, 1, GL_FALSE, &depthMVP[0][0]);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glDrawElements(GL_TRIANGLES, numElements, GL_UNSIGNED_SHORT, NULL);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void OGLRenderer::draw(//glm::mat4 MVP
@@ -959,3 +995,4 @@ void OGLRenderer::setLightVPMatrices(glm::mat4 view
 	mLightViewMatrix = view;
 //	mVPMatrix = mPMatrix * mVMatrix;
 }
+

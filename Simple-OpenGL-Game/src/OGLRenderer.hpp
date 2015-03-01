@@ -53,6 +53,7 @@ public:
 		PlaneVertBuf,
 		PlaneColBuf,
 		QuadVertBuf,
+		QuadColBuf,
 		QuadUVBuf,
 		NumVBO
 	};
