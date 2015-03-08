@@ -50,8 +50,8 @@
 		<Unit filename="shaders/DepthRTT.vert" />
 		<Unit filename="shaders/DirLighting.frag" />
 		<Unit filename="shaders/DirLighting.vert" />
-		<Unit filename="shaders/Simple.frag" />
-		<Unit filename="shaders/Simple.vert" />
+		<Unit filename="shaders/Texturing2D.frag" />
+		<Unit filename="shaders/Texturing2D.vert" />
 		<Unit filename="src/ComputeMatricesFromInput.hpp" />
 		<Unit filename="src/Controller.hpp" />
 		<Unit filename="src/LightSource.hpp" />
@@ -61,6 +61,7 @@
 		<Unit filename="src/Node.hpp" />
 		<Unit filename="src/OBJMesh.hpp" />
 		<Unit filename="src/OGLRenderer.hpp" />
+		<Unit filename="src/Player.hpp" />
 		<Unit filename="src/PointSource.hpp" />
 		<Unit filename="src/SceneNode.hpp" />
 		<Unit filename="src/Shader.hpp" />

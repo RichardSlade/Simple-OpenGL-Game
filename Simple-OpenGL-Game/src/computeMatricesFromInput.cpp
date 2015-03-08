@@ -3,12 +3,12 @@
 #include <cmath>
 #include <iostream>
 
-static glm::vec3 position = glm::vec3(0, 10, 15);
-static float horizontalAngle = -2.5f;
+static glm::vec3 position = glm::vec3(0, 1, 5);
+static float horizontalAngle = 3.f;
 //static float horizontalAngle = 0.f;
-static float verticalAngle = -0.4f;
+static float verticalAngle = -0.0f;
 static float initialFoV = 45.f;
-static float speed = 4.f;
+static float speed = 8.f;
 static float mouseSpeed = 0.04f;
 
 glm::mat4 CubeMapModelMatrix;

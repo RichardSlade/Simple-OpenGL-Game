@@ -26,9 +26,6 @@ World::World(OGLRenderer &renderer)
 
 	// Build world using allocated mesh data
    buildWorld();
-
-//   mRenderer.setDirLightSource(&mDirLightSource);
-//   mRenderer.setPntLightSources(&mPntLightSources);
 }
 
 void World::loadObjects()
@@ -54,7 +51,7 @@ void World::buildWorld()
 {
 	int shaderCount = mRenderer.getShaderCount();
 
-	for(int i = 0; i < shaderCount; i++)
+	for(int i = 0; i < shaderCount - 2; i++)
 	{
 		std::unique_ptr<ShaderNode> shaderNode(new ShaderNode(Node::NodeType::ShdrNode
 																			 , mRenderer
@@ -66,7 +63,7 @@ void World::buildWorld()
 		mSceneGraph.attachChild(std::move(shaderNode));
 	}
 
-	glm::vec3 pos(-20, 10, 10);
+	glm::vec3 pos(16.f, 40.f, 20.f);
 	glm::vec3 lightScale(2.f, 2.f, 2.f);
 
 	// Create directional light source
@@ -80,34 +77,8 @@ void World::buildWorld()
 
 	mRenderer.setDirLightSource(&mDirLightSource);
 
-//	lightScale = glm::vec3(0.25, 0.25, 0.25);
-
-//	mLightProjMatrix = glm::ortho<float>(-10,10,-10,10,-10,20);
-//	mLightProjMatrix = glm::perspective(45.f, 4.0f / 3.0f, 0.1f, 100.0f);
-//	mLightViewMatrix = glm::lookAt(mDirLightSource, -mDirLightSource, glm::vec3(0,1,0));
-//	mRenderer.setLightVPMatrices(mLightViewMatrix
-//											, mLightProjMatrix);
-
-	// Create point light sources
-//	for(int i = 0; i < 1; i++)
-//	{
-//		pos = glm::vec3(i, 40, 10);
-//
-//		mPntLightSources.push_back(pos);
-//
-//		createObject(LightObj
-//						, ShaderNodeTypes::SimpleShaderNode
-//						, pos
-//						, lightScale);
-//	}
-
-//	createObject(SpherePntLightObj
-//					, ShaderNodeTypes::PntLightShaderNode
-//					, glm::vec3(0, 1, 0));
-
 	// Floor
 	createObject(FloorDirLightObj
-//					, ShaderNodeTypes::SimpleShaderNode
 					, ShaderNodeTypes::DirLightShaderNode
 					, glm::vec3(0));
 
@@ -203,7 +174,9 @@ void World::createObject(ObjectTypes objType
 																		, mRenderer.getVAO(OGLRenderer::VertexArrays::PlaneDirLightVAO)
 																		, mRenderer.getVAO(OGLRenderer::VertexArrays::PlaneDepthVAO)
 																		, mRenderer.getEBO(OGLRenderer::ElementArrayBuffers::PlaneEBO)
-																		, 6));
+																		, 6
+																		, mRenderer.getTex(OGLRenderer::Textures::StoneTex)
+																		, mRenderer.getTexTarget(OGLRenderer::Textures::StoneTex)));
 
 			break;
 		}
@@ -216,21 +189,14 @@ void World::createObject(ObjectTypes objType
 
 void World::drawWorld()
 {
-	enum isDepthPass {Normal, Depth};
-
 	// Shadow map pass
-	mRenderer.clearContext(isDepthPass::Depth);
-
 	mRenderer.setupDepthPass();
-
-//	mRenderer.setupShader(mRenderer.getShaderProgramID(OGLRenderer::Programs::DepthProgram));
-
 	mSceneGraph.depthPass();
-
 	mRenderer.finishDepthPass();
 
-	// Now regular rendering pass
-	mRenderer.clearContext(isDepthPass::Normal);
+//	mRenderer.drawShadowMap();
 
+	// Regular rendering pass
+	mRenderer.clearContext();
 	mSceneGraph.draw();
 }

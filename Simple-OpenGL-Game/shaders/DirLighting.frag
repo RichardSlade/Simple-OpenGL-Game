@@ -11,7 +11,7 @@ in VS_FS_INTERFACE
 {
 	vec4 shadowCoord;
 //	vec4 colour;
-	vec4 uv;
+	vec2 uv;
 	vec3 worldCoord;
 	vec3 eyeCoord;
 	vec3 normal;
@@ -76,20 +76,22 @@ void main()
 	vec4 tempShadowCoord = Fragment.shadowCoord;
 	tempShadowCoord.z -= bias;
 
-	float f = textureProj(DepthSampler, tempShadowCoord);
+	float f = textureProj(ShadowSampler, tempShadowCoord);
 
-//	int index = 0;
-//
-//   for(int i = 0; i < 16; i++)
-//	{
-////		int index = int(16.0 * random(floor(Fragment.worldCoord.xyz * 1000.0), i)) % 16;
-//		f -= 0.2 * (1.0 - texture(DepthSampler, vec3(Fragment.shadowCoord.xy + poissonDisk[i] / 700.0,  (Fragment.shadowCoord.z - bias) / Fragment.shadowCoord.w)));
-//	}
+////	int index = 0;
+////
+////   for(int i = 0; i < 16; i++)
+////	{
+//////		int index = int(16.0 * random(floor(Fragment.worldCoord.xyz * 1000.0), i)) % 16;
+////		f -= 0.2 * (1.0 - texture(DepthSampler, vec3(Fragment.shadowCoord.xy + poissonDisk[i] / 700.0,  (Fragment.shadowCoord.z - bias) / Fragment.shadowCoord.w)));
+////	}
 
 	vec4 texColour = texture2D(Tex2DSampler, Fragment.uv);
+//	vec4 texColour = vec4(1, 0, 1, 1);
 
-//	vec3 rgb = min(Fragment.colour.rgb * scatteredLight + reflectedLight, vec3(1.0));
-	vec3 rgb = min(texColour.rgb * scatteredLight + reflectedLight, texColour.a);
+////	vec3 rgb = min(Fragment.colour.rgb * scatteredLight + reflectedLight, vec3(1.0));
+	vec3 rgb = min(texColour.rgb * scatteredLight + reflectedLight, vec3(1.0));
 
-   FragColour = vec4(f * rgb, Fragment.colour.a);
+   FragColour = vec4(f * rgb, texColour.a);
+//   FragColour = vec4(rgb, texColour.a);
 }

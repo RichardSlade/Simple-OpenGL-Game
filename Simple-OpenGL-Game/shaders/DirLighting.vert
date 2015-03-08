@@ -8,7 +8,7 @@ uniform mat4 ShadowMatrix;
 
 layout(location = 0) in vec4 vPosition;
 //layout(location = 1) in vec4 vColour;
-layout(location = 1) in vec4 vUV;
+layout(location = 1) in vec2 vUV;
 layout(location = 2) in vec3 vNormal;
 
 //out vec4 Colour;
@@ -17,7 +17,7 @@ out VS_FS_INTERFACE
 {
 	vec4 shadowCoord;
 //	vec4 colour;
-	vec4 uv;
+	vec2 uv;
 	vec3 worldCoord;
 	vec3 eyeCoord;
 	vec3 normal;

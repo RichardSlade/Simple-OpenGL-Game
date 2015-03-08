@@ -39,36 +39,59 @@ bool OGLRenderer::init(sf::RenderWindow *window)
 		return false;
 	}
 
-	loadPrograms();
+	if(!loadPrograms())
+		return false;
+
 	loadTextures(window->getSize());
 
 	return true;
 }
 
-void OGLRenderer::loadPrograms()
+bool OGLRenderer::loadPrograms()
 {
+	int pID;
+
+	// Colour
 	ShaderInfo shader_info_one[] =
     {
-        { GL_VERTEX_SHADER, "shaders/Simple.vert" },
-        { GL_FRAGMENT_SHADER, "shaders/Simple.frag" },
+        { GL_VERTEX_SHADER, "shaders/Colour.vert" },
+        { GL_FRAGMENT_SHADER, "shaders/Colour.frag" },
         { GL_NONE, NULL }
     };
 
 	// Create and compile our GLSL program from the shaders
-	mProgramID[SimpleProgram] = LoadShaders(shader_info_one);
+	pID = LoadShaders(shader_info_one);
+
+	if(pID == 0)
+	{
+		std::cerr << "Error: OGLRenderer.loadPrograms(): Simple Shader" << std::endl;
+		return false;
+	}
+
+	mProgramID[ColourProgram] = pID;
 	mShaderInfo.push_back(Shader::ShaderUPtr(new SimpleShader()));
 
+	// Dir Lighting
 	ShaderInfo shader_info_two[] =
-    {
-        { GL_VERTEX_SHADER, "shaders/DirLightingTex.vert" },
-        { GL_FRAGMENT_SHADER, "shaders/DirLightingTex.frag" },
-        { GL_NONE, NULL }
-    };
+	{
+		{ GL_VERTEX_SHADER, "shaders/DirLighting.vert" },
+		{ GL_FRAGMENT_SHADER, "shaders/DirLighting.frag" },
+		{ GL_NONE, NULL }
+	};
+
+	pID = LoadShaders(shader_info_two);
+
+	if(pID == 0)
+	{
+		std::cerr << "Error: OGLRenderer.loadPrograms(): DirLighting Shader" << std::endl;
+		return false;
+	}
 
 	// Create and compile our GLSL program from the shaders
-	mProgramID[DirLightProgram] = LoadShaders(shader_info_two);
+	mProgramID[DirLightProgram] = pID;
 	mShaderInfo.push_back(Shader::ShaderUPtr(new LightingShader()));
 
+	// Depth
 	ShaderInfo shader_info_three[] =
 	{
         { GL_VERTEX_SHADER, "shaders/DepthRTT.vert" },
@@ -76,11 +99,41 @@ void OGLRenderer::loadPrograms()
         { GL_NONE, NULL }
 	};
 
+	pID = LoadShaders(shader_info_three);
+
+	if(pID == 0)
+	{
+		std::cerr << "Error: OGLRenderer.loadPrograms(): Depth Shader" << std::endl;
+		return false;
+	}
+
 	// Create and compile our GLSL program from the shaders
-	mProgramID[DepthProgram] = LoadShaders(shader_info_three);
+	mProgramID[DepthProgram] = pID;
 	mShaderInfo.push_back(Shader::ShaderUPtr(new ShadowShader()));
 
+	//Tex 2D
+	ShaderInfo shader_info_four[] =
+	{
+        { GL_VERTEX_SHADER, "shaders/Texturing2D.vert" },
+        { GL_FRAGMENT_SHADER, "shaders/Texturing2D.frag" },
+        { GL_NONE, NULL }
+	};
+
+	pID = LoadShaders(shader_info_four);
+
+	if(pID == 0)
+	{
+		std::cerr << "Error: OGLRenderer.loadPrograms(): Depth Shader" << std::endl;
+		return false;
+	}
+
+	// Create and compile our GLSL program from the shaders
+	mProgramID[Tex2DProgram] = pID;
+	mShaderInfo.push_back(Shader::ShaderUPtr(new Texture2DShader()));
+
 	allocProgramUniforms();
+
+	return true;
 }
 
 bool OGLRenderer::loadTextures(sf::Vector2u windowSize)
@@ -91,7 +144,7 @@ bool OGLRenderer::loadTextures(sf::Vector2u windowSize)
 //	glActiveTexture(mTexTargets[WoodBoxTex]);
 
 	sf::Image image;
-	if (!image.loadFromFile("media/WoodBox.png"))
+	if (!image.loadFromFile("media/woodBox.png"))
 		return EXIT_FAILURE;
 
 	glBindTexture(GL_TEXTURE_2D, mTex[WoodBoxTex]);
@@ -111,9 +164,7 @@ bool OGLRenderer::loadTextures(sf::Vector2u windowSize)
     glGenerateMipmap(GL_TEXTURE_2D);
 
 	mTexTargets[BlueMarbleTex] = GL_TEXTURE1;
-//	glActiveTexture(mTexTargets[BlueMarbleTex]);
-
-	if (!image.loadFromFile("media/BlueMarble.png"))
+	if (!image.loadFromFile("media/blueMarble.png"))
 		return EXIT_FAILURE;
 
 	glBindTexture(GL_TEXTURE_2D, mTex[BlueMarbleTex]);
@@ -132,9 +183,33 @@ bool OGLRenderer::loadTextures(sf::Vector2u windowSize)
 
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	mTexTargets[DepthTex] = GL_TEXTURE2;
-//	glActiveTexture(mTexTargets[DepthTex]);
+	// Stone
+	mTexTargets[StoneTex] = GL_TEXTURE2;
 
+	if (!image.loadFromFile("media/stone.png"))
+		return EXIT_FAILURE;
+
+	glBindTexture(GL_TEXTURE_2D, mTex[StoneTex]);
+	glTexStorage2D(GL_TEXTURE_2D, 8, GL_RGBA8, image.getSize().x, image.getSize().y);
+	glTexSubImage2D(GL_TEXTURE_2D
+					, 0
+					, 0, 0
+					, image.getSize().x, image.getSize().y
+					, GL_RGBA, GL_UNSIGNED_BYTE
+					, image.getPixelsPtr());
+
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	// Depth
+	mTexTargets[DepthTex] = GL_TEXTURE3;
 	glBindTexture(GL_TEXTURE_2D, mTex[DepthTex]);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32
@@ -144,12 +219,11 @@ bool OGLRenderer::loadTextures(sf::Vector2u windowSize)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE,
-						GL_COMPARE_REF_TO_TEXTURE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -238,6 +312,14 @@ bool OGLRenderer::loadWorldData(World *world)
 		-50, 0, -50, 1,
 	};
 
+	const GLfloat planeUV[] =
+	{
+		0.f, 0.f,
+		50.f, 0.f,
+		50.f, 50.f,
+		0.f, 50.f,
+	};
+
 	const GLushort planeEle[] =
 	{
 		0, 1, 2,
@@ -245,16 +327,47 @@ bool OGLRenderer::loadWorldData(World *world)
 	};
 
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO[PlaneVertBuf]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(planeVerts), planeVerts, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(planeVerts), &planeVerts[0], GL_STATIC_DRAW);
 
-   glBindBuffer(GL_ARRAY_BUFFER, mVBO[PlaneColBuf]);
-   glBufferData(GL_ARRAY_BUFFER, planeColours.size() * sizeof(glm::vec4), &planeColours[0], GL_STATIC_DRAW);
+//   glBindBuffer(GL_ARRAY_BUFFER, mVBO[PlaneColBuf]);
+//   glBufferData(GL_ARRAY_BUFFER, planeColours.size() * sizeof(glm::vec4), &planeColours[0], GL_STATIC_DRAW);
+
+   glBindBuffer(GL_ARRAY_BUFFER, mVBO[PlaneUVBuf]);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(planeUV), &planeUV[0], GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO[PlaneNormBuf]);
    glBufferData(GL_ARRAY_BUFFER, planeNorms.size() * sizeof(glm::vec3), &planeNorms[0], GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO[PlaneEBO]);
-   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(planeEle), planeEle, GL_STATIC_DRAW);
+   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(planeEle), &planeEle[0], GL_STATIC_DRAW);
+
+   const GLfloat quadVerts[] =
+	{
+		-1.f, -1.f, 0.f, 1.f,
+		 1.f, -1.f, 0.f, 1.f,
+		 1.f,  1.f, 0.f, 1.f,
+
+		-1.f, -1.f, 0.f, 1.f,
+		 1.f,  1.f, 0.f, 1.f,
+		-1.f,  1.f, 0.f, 1.f,
+	};
+
+	const GLfloat quadUV[] =
+	{
+		0.f, 0.f,
+		1.f, 0.f,
+		1.f, 1.f,
+
+		0.f, 0.f,
+		1.f, 1.f,
+		0.f, 1.f,
+	};
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[QuadVertBuf]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVerts), &quadVerts[0], GL_STATIC_DRAW);
+
+   glBindBuffer(GL_ARRAY_BUFFER, mVBO[QuadUVBuf]);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(quadUV), &quadUV[0], GL_STATIC_DRAW);
 
 	setupVAO();
 
@@ -365,24 +478,24 @@ void OGLRenderer::setupVAO()
 	glBindVertexArray(mVAO[LightVAO]);
 
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthVertBuf]);
-	glVertexAttribPointer(mShaderInfo.at(SimpleProgram)->position
+	glVertexAttribPointer(mShaderInfo.at(ColourProgram)->position
 								, 4
 								, GL_FLOAT
 								, GL_FALSE
 								, 0
 								, (void*)0);
 
-	glEnableVertexAttribArray(mShaderInfo.at(SimpleProgram)->position);
+	glEnableVertexAttribArray(mShaderInfo.at(ColourProgram)->position);
 
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO[LightColBuf]);
-	glVertexAttribPointer(mShaderInfo.at(SimpleProgram)->colour
+	glVertexAttribPointer(mShaderInfo.at(ColourProgram)->colour
 								, 4
 								, GL_FLOAT
 								, GL_TRUE
 								, 0
 								, (void*)0);
 
-	glEnableVertexAttribArray(mShaderInfo.at(SimpleProgram)->colour);
+	glEnableVertexAttribArray(mShaderInfo.at(ColourProgram)->colour);
 
 	// Plane VAO
 	glBindVertexArray(mVAO[PlaneDirLightVAO]);
@@ -430,17 +543,42 @@ void OGLRenderer::setupVAO()
 
 	glEnableVertexAttribArray(mShaderInfo.at(DepthProgram)->position);
 
+	// Quad
+//	Texture2DShader *texShader = dynamic_cast<Texture2DShader*>(mShaderInfo.at(Tex2DProgram).get());
+
+	glBindVertexArray(mVAO[QuadVAO]);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[QuadVertBuf]);
+	glVertexAttribPointer(0
+								, 4
+								, GL_FLOAT
+								, GL_FALSE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[QuadUVBuf]);
+	glVertexAttribPointer(1
+								, 2
+								, GL_FLOAT
+								, GL_FALSE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(1);
+
 	glBindVertexArray(0);
 }
 
 void OGLRenderer::allocProgramUniforms()
 {
 	// Simple Shader uniforms
-	mShaderInfo.at(SimpleProgram)->MVP = glGetUniformLocation(mProgramID[SimpleProgram], "MVP");
+	mShaderInfo.at(ColourProgram)->MVP = glGetUniformLocation(mProgramID[ColourProgram], "MVP");
 
 	// Simple Shader variables
-	mShaderInfo.at(SimpleProgram)->position = glGetAttribLocation(mProgramID[SimpleProgram], "vPosition");
-	mShaderInfo.at(SimpleProgram)->colour = glGetAttribLocation(mProgramID[SimpleProgram], "vColour");
+	mShaderInfo.at(ColourProgram)->position = glGetAttribLocation(mProgramID[ColourProgram], "vPosition");
+	mShaderInfo.at(ColourProgram)->colour = glGetAttribLocation(mProgramID[ColourProgram], "vColour");
 
 	// Directional lighting shader uniforms
 	LightingShader *lightShader = dynamic_cast<LightingShader*>(mShaderInfo.at(DirLightProgram).get());
@@ -549,20 +687,10 @@ unsigned int OGLRenderer::texTargetToUInt(GLenum texTarget)
 	}
 }
 
-void OGLRenderer::clearContext(bool isShadowPass)
+void OGLRenderer::clearContext()
 {
-//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 	glClearColor(0.3f, 0.3f, 0.5f, 1.f);
-
-   if(isShadowPass)
-	{
-		glClear(GL_DEPTH_BUFFER_BIT);
-	}
-	else
-	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	}
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void OGLRenderer::setupDepthPass()
@@ -570,13 +698,10 @@ void OGLRenderer::setupDepthPass()
 	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-//	glCullFace(GL_FRONT);
 	glEnable(GL_POLYGON_OFFSET_FILL);
-
 	glViewport(0, 0, mWindow->getSize().x * 2, mWindow->getSize().y * 2);
 	glCullFace(GL_FRONT);
 
-	glUseProgram(mProgramID[DepthProgram]);
 }
 
 void OGLRenderer::finishDepthPass()
@@ -584,8 +709,11 @@ void OGLRenderer::finishDepthPass()
 	glDisable(GL_POLYGON_OFFSET_FILL);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glViewport(0, 0,  mWindow->getSize().x, mWindow->getSize().y);
 
+//	glClearColor(0.3f, 0.3f, 0.5f, 1.f);
+//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glViewport(0, 0,  mWindow->getSize().x, mWindow->getSize().y);
 	glCullFace(GL_BACK);
 }
 
@@ -594,24 +722,26 @@ void OGLRenderer::setupShader(int shaderID)
 	glUseProgram(shaderID);
 }
 
-//void OGLRenderer::drawShadowMap()
-//{
-//	glUseProgram(mProgramID[DepthTexProgram]);
-//	glBindVertexArray(mVAO[ShadowMapVAO]);
-//
-//	GLuint tex2DsamplerID = glGetUniformLocation(mProgramID[DepthTexProgram], "Tex2DSampler");
-//
-////	glUniform1i(1, 2);
-//	glUniform1i(tex2DsamplerID, texTargetToUInt(mTexTargets[DepthTex]));
-////	glUniform1i(tex2DsamplerID, texTargetToUInt(mTexTargets[WoodBoxTex]));
-//	glActiveTexture(mTexTargets[DepthTex]);
-////	glActiveTexture(mTexTargets[WoodBoxTex]);
-////	glActiveTexture(GL_TEXTURE2);
-////	glBindTexture(GL_TEXTURE_2D, mTex[WoodBoxTex]);
-//	glBindTexture(GL_TEXTURE_2D, mTex[DepthTex]);
-//
-//	glDrawArrays(GL_TRIANGLES, 0, 6);
-//}
+void OGLRenderer::drawShadowMap()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glUseProgram(mProgramID[Tex2DProgram]);
+
+	glClearColor(0.2f, 0.5f, 0.2f, 1.f);
+	glViewport(0, 0, mWindow->getSize().x, mWindow->getSize().y);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	GLuint tex2DsamplerID = glGetUniformLocation(mProgramID[Tex2DProgram], "Tex2DSampler");
+
+	glUniform1i(tex2DsamplerID, texTargetToUInt(mTexTargets[DepthTex]));
+	glActiveTexture(mTexTargets[DepthTex]);
+	glBindTexture(GL_TEXTURE_2D, mTex[DepthTex]);
+
+	glBindVertexArray(mVAO[QuadVAO]);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
 
 void OGLRenderer::drawDepth(glm::mat4 M
 									 , GLuint VAO
@@ -619,7 +749,17 @@ void OGLRenderer::drawDepth(glm::mat4 M
 									 , GLuint numElements
 )
 {
+	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
+//	glClear(GL_DEPTH_BUFFER_BIT);
+
+//	glEnable(GL_POLYGON_OFFSET_FILL);
+//	glViewport(0, 0, mWindow->getSize().x * 2, mWindow->getSize().y * 2);
+//	glCullFace(GL_FRONT);
+
+	glUseProgram(mProgramID[DepthProgram]);
+
 	glm::mat4 depthMVP = mDirLightSource->P * mDirLightSource->V * M;
+//	glm::mat4 depthMVP = getProjectionMatrix() * getViewMatrix() * M;
 
 	ShadowShader* shadowShader = dynamic_cast<ShadowShader*>(mShaderInfo.at(DepthProgram).get());
 	glUniformMatrix4fv(shadowShader->depthMVP, 1, GL_FALSE, &depthMVP[0][0]);
@@ -628,7 +768,7 @@ void OGLRenderer::drawDepth(glm::mat4 M
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glDrawElements(GL_TRIANGLES, numElements, GL_UNSIGNED_SHORT, NULL);
 
-//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void OGLRenderer::draw(glm::mat4 M
@@ -648,9 +788,9 @@ void OGLRenderer::draw(glm::mat4 M
 
 	switch(progType)
 	{
-		case SimpleProgram:
+		case ColourProgram:
 		{
-			SimpleShader *shdr = dynamic_cast<SimpleShader*>(mShaderInfo.at(SimpleProgram).get());
+			SimpleShader *shdr = dynamic_cast<SimpleShader*>(mShaderInfo.at(ColourProgram).get());
 
 			glm::mat4 MVP = P * V * M;
 			glUniformMatrix4fv(shdr->MVP, 1, GL_FALSE, &MVP[0][0]);

@@ -27,8 +27,8 @@ struct LightSource
 						: position(pos)
 						, viewDirection(viewDir)
 						{
-							V = glm::lookAt(pos, viewDir, glm::vec3(0, 1, 0));
-							P = glm::ortho<float>(-10.f, 10.f, -10.f, 10.f, -10.f, 20.f);
+							V = glm::lookAt(pos, viewDir, glm::vec3(0.f, 1.f, 0.f));
+							P = glm::ortho<float>(-10.f, 10.f, -10.f, 10.f, 1.f, 50.f);
 						};
 };
 

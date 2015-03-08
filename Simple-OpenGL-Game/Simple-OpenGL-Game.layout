@@ -1,58 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="src/OGLRenderer.hpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="shaders/DirLighting.frag" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1621" topLine="39" />
+			<Cursor1 position="2747" topLine="60" />
 		</Cursor>
 	</File>
-	<File name="src/LightingShader.hpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="shaders/DepthRTT.vert" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="199" topLine="0" />
+			<Cursor1 position="266" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="src/computeMatricesFromInput.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src/Player.hpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2824" topLine="72" />
-		</Cursor>
-	</File>
-	<File name="src/mesh.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1303" topLine="55" />
-		</Cursor>
-	</File>
-	<File name="src/ComputeMatricesFromInput.hpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="144" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="src/LightSource.hpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="463" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="src/ShadowShader.hpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="191" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="src/sceneNode.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="501" topLine="0" />
-		</Cursor>
-		<Folding>
-			<Collapse line="32" />
-			<Collapse line="51" />
-		</Folding>
-	</File>
-	<File name="src/ShaderNode.hpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="758" topLine="13" />
-		</Cursor>
-	</File>
-	<File name="src/World.hpp" open="1" top="1" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="412" topLine="0" />
+			<Cursor1 position="108" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="src/node.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -60,42 +21,19 @@
 			<Cursor1 position="319" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="src/Node.hpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src/LightSource.hpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="508" topLine="19" />
+			<Cursor1 position="23" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="src/Texture2DShader.hpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src/LightingShader.hpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="154" topLine="0" />
+			<Cursor1 position="199" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="src/oglRenderer.cpp" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+	<File name="src/ShadowShader.hpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="19481" topLine="0" />
-		</Cursor>
-		<Folding>
-			<Collapse line="15" />
-			<Collapse line="20" />
-			<Collapse line="48" />
-			<Collapse line="86" />
-			<Collapse line="176" />
-			<Collapse line="264" />
-			<Collapse line="436" />
-			<Collapse line="468" />
-			<Collapse line="529" />
-			<Collapse line="540" />
-			<Collapse line="552" />
-			<Collapse line="568" />
-			<Collapse line="582" />
-			<Collapse line="592" />
-			<Collapse line="597" />
-			<Collapse line="720" />
-		</Folding>
-	</File>
-	<File name="shaders/DirLighting.vert" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="591" topLine="0" />
+			<Cursor1 position="191" topLine="0" />
 		</Cursor>
 	</File>
 	<File name="src/controller.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="-1" zoom_2="0">
@@ -103,19 +41,24 @@
 			<Cursor1 position="1234" topLine="47" />
 		</Cursor>
 	</File>
-	<File name="src/SceneNode.hpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="shaders/Texturing2D.vert" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="915" topLine="24" />
+			<Cursor1 position="162" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="src/world.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="-2" zoom_2="0">
+	<File name="src/Node.hpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="6023" topLine="69" />
+			<Cursor1 position="508" topLine="19" />
 		</Cursor>
 	</File>
-	<File name="shaders/Simple.frag" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src/mesh.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="58" topLine="0" />
+			<Cursor1 position="1303" topLine="55" />
+		</Cursor>
+	</File>
+	<File name="src/loadShaders.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3189" topLine="37" />
 		</Cursor>
 	</File>
 	<File name="src/Shader.hpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -128,9 +71,100 @@
 			<Cursor1 position="420" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="shaders/DirLighting.frag" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="src/sceneNode.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="2702" topLine="58" />
+			<Cursor1 position="1608" topLine="32" />
+		</Cursor>
+		<Folding>
+			<Collapse line="32" />
+			<Collapse line="51" />
+		</Folding>
+	</File>
+	<File name="src/LoadShaders.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="7" />
+		</Cursor>
+	</File>
+	<File name="src/computeMatricesFromInput.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3091" topLine="84" />
+		</Cursor>
+	</File>
+	<File name="shaders/DepthRTT.frag" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="195" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="src/SceneNode.hpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="915" topLine="24" />
+		</Cursor>
+	</File>
+	<File name="src/oglRenderer.cpp" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="-3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="5863" topLine="69" />
+		</Cursor>
+		<Folding>
+			<Collapse line="15" />
+			<Collapse line="20" />
+			<Collapse line="50" />
+			<Collapse line="250" />
+			<Collapse line="377" />
+			<Collapse line="574" />
+			<Collapse line="606" />
+			<Collapse line="667" />
+			<Collapse line="678" />
+			<Collapse line="690" />
+			<Collapse line="696" />
+			<Collapse line="707" />
+			<Collapse line="720" />
+			<Collapse line="725" />
+			<Collapse line="860" />
+		</Folding>
+	</File>
+	<File name="src/World.hpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="174" topLine="11" />
+		</Cursor>
+	</File>
+	<File name="src/world.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="-2" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1653" topLine="9" />
+		</Cursor>
+		<Folding>
+			<Collapse line="15" />
+			<Collapse line="31" />
+			<Collapse line="98" />
+		</Folding>
+	</File>
+	<File name="src/ComputeMatricesFromInput.hpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="144" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="src/Texture2DShader.hpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="154" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="src/ShaderNode.hpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="758" topLine="13" />
+		</Cursor>
+	</File>
+	<File name="src/OGLRenderer.hpp" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1146" topLine="15" />
+		</Cursor>
+	</File>
+	<File name="shaders/DirLighting.vert" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="95" topLine="4" />
+		</Cursor>
+	</File>
+	<File name="shaders/Texturing2D.frag" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="298" topLine="0" />
 		</Cursor>
 	</File>
 </CodeBlocks_layout_file>

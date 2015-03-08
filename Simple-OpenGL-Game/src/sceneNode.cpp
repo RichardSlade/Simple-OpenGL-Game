@@ -71,9 +71,9 @@ void SceneNode::draw()
 void SceneNode::depthPass()
 {
    mOGLRenderer.drawDepth(mModelMatrix
-									, mDepthVAO
-									, mEBO
-									, mNumElements);
+								 , mDepthVAO
+								 , mEBO
+								 , mNumElements);
 
 	for(unsigned int i = 0; i < mChildren.size(); i++)
 		mChildren.at(i)->depthPass();

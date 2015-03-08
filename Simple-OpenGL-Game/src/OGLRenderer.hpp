@@ -40,6 +40,7 @@ public:
 		PlaneDepthVAO,
 		PlaneDirLightVAO,
 //		ShadowMapVAO,
+		QuadVAO,
 		NumVAO
 	};
 
@@ -53,12 +54,12 @@ public:
 		EarthUVBuf,
 		LightColBuf,
 		PlaneVertBuf,
-		PlaneColBuf,
+//		PlaneColBuf,
 		PlaneNormBuf,
 		PlaneUVBuf,
-//		QuadVertBuf,
+		QuadVertBuf,
 //		QuadColBuf,
-//		QuadUVBuf,
+		QuadUVBuf,
 		NumVBO
 	};
 
@@ -74,19 +75,20 @@ public:
 	{
 		WoodBoxTex,
 		BlueMarbleTex,
+		StoneTex,
 		DepthTex,
 		NumTex
 	};
 
 	enum Programs
 	{
-		SimpleProgram,
-//		Tex2DProgram,
+		ColourProgram,
 //		DirLightProgram,
 //		PntLightProgram,
 		DirLightProgram,
 		DepthProgram,
 //		DepthTexProgram,
+		Tex2DProgram,
 		NumPrograms
 	};
 
@@ -116,7 +118,7 @@ private:
 
 	std::vector<Shader::ShaderUPtr> mShaderInfo;
 
-	void 							loadPrograms();
+	bool 							loadPrograms();
 	bool							loadTextures(sf::Vector2u windowSize);
 	void							allocProgramUniforms();
 	void 							setupVAO();
@@ -138,7 +140,7 @@ public:
 	bool 							init(sf::RenderWindow *window);
 	bool 							loadWorldData(World *world);
 
-	void 							clearContext(bool isShadowPass);
+	void 							clearContext();
 
 	void 							setupDepthPass();
 
@@ -146,7 +148,7 @@ public:
 
 	void 							setupShader(int shaderID);
 
-//	void 						drawShadowMap();
+	void 						drawShadowMap();
 
 	void						drawDepth(glm::mat4 MVP
 											 , GLuint VAO
