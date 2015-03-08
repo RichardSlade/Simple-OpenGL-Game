@@ -10,20 +10,20 @@ public:
 
 	// Uniforms
 	GLint 				MVP;
-	GLint 				MV;
-	GLint					NormMat;
+//	GLint 				MV;
+//	GLint					NormMat;
 
 	// Variables
-	GLint				Position;
-	GLint				Colour;
+	GLint				position;
+	GLint				colour;
 	GLint				UV;
 
 						Shader()
 						: MVP(0)
-						, MV(0)
-						, NormMat(0)
-						, Position(0)
-						, Colour(0)
+//						, MV(0)
+//						, NormMat(0)
+						, position(0)
+						, colour(0)
 						, UV(0)
 						{};
 

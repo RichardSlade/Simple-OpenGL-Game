@@ -4,6 +4,7 @@
 #include "OBJMesh.hpp"
 //#include "SceneNode.hpp"
 #include "ShaderNode.hpp"
+#include "LightSource.hpp"
 
 class OGLRenderer;
 
@@ -22,23 +23,23 @@ public:
 	enum ShaderNodeTypes
 	{
 		SimpleShaderNode,
-		Tex2DShaderNode,
+//		Tex2DShaderNode,
 		DirLightShaderNode,
-		PntLightShaderNode,
-		ShadowShaderNode,
+//		PntLightShaderNode,
+//		ShadowShaderNode,
 		NumShaderNodeTypes
 	};
 
 	enum ObjectTypes
 	{
-		CubeColObj,
+//		CubeColObj,
 		CubeDirLightObj,
-		CubePntLightObj,
-		SphereColObj,
+//		CubePntLightObj,
+//		SphereColObj,
 		SphereDirLightObj,
-		SpherePntLightObj,
+//		SpherePntLightObj,
 		LightObj,
-		FloorObj,
+		FloorDirLightObj,
 		NumObjectTypes
 	};
 
@@ -50,7 +51,7 @@ private:
 	Node									mSceneGraph;
 	std::vector<ShaderNode*>		mSceneGraphShaderNodes;
 
-	glm::vec3						mDirLightSource;
+	LightSource						mDirLightSource;
 	std::vector<glm::vec3>		mPntLightSources;
 
 	glm::mat4 						mLightViewMatrix;

@@ -7,8 +7,8 @@ struct ShadowShader : public LightingShader
 {
 public:
 	// Uniforms
-   GLuint 				ShadowSampler;
-	GLuint 				DepthMVP;
+   GLuint 				shadowSampler;
+	GLuint 				depthMVP;
 };
 
 #endif // SHADOWSHADER_HPP

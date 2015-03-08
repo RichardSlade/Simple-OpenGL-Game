@@ -56,7 +56,7 @@ void Controller::run()
 			countDown = mFPS;
 			computeMatricesFromInput(mWindow.get(), mFPS);
 
-			mOGLRenderer.setPlayerVPMatrices();
+//			mOGLRenderer.setPlayerVPMatrices();
 		}
 
 		mWindow->clear();

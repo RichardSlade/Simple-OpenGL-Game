@@ -755,7 +755,7 @@
 	<string>
 	<vector>
 
-1425146964 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/controller.cpp
+1425771768 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/controller.cpp
 	<iostream>
 	<SFML/System.hpp>
 	"Controller.hpp"
@@ -765,7 +765,7 @@
 	"OGLRenderer.hpp"
 	"World.hpp"
 
-1425209605 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/OGLRenderer.hpp
+1425771677 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/OGLRenderer.hpp
 	<memory>
 	<vector>
 	<GL/glew.h>
@@ -775,6 +775,7 @@
 	<SFML/System.hpp>
 	"LoadShaders.h"
 	"Shader.hpp"
+	"LightSource.hpp"
 
 1374502282 /home/rts/Libraries/glew-1.10.0/include/GL/glew.h
 	<stddef.h>
@@ -787,12 +788,13 @@
 1421195726 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/LoadShaders.h
 	<GL/gl.h>
 
-1424386182 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/Shader.hpp
+1425772401 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/Shader.hpp
 	<memory>
 
-1425143247 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/World.hpp
+1425768560 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/World.hpp
 	"OBJMesh.hpp"
 	"ShaderNode.hpp"
+	"LightSource.hpp"
 
 1423758740 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/OBJMesh.hpp
 	<memory>
@@ -804,11 +806,11 @@
 	<GL/glew.h>
 	<glm/glm.hpp>
 
-1425146007 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/ShaderNode.hpp
+1425770002 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/ShaderNode.hpp
 	"Node.hpp"
 	"OGLRenderer.hpp"
 
-1425146195 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/Node.hpp
+1425769979 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/Node.hpp
 	<glm/glm.hpp>
 	<vector>
 	<memory>
@@ -829,7 +831,7 @@
 	<iostream>
 	"Mesh.hpp"
 
-1425146207 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/node.cpp
+1425770019 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/node.cpp
 	<iostream>
 	<glm/glm.hpp>
 	<glm/gtc/matrix_transform.hpp>
@@ -844,7 +846,7 @@
 	<map>
 	"OBJMesh.hpp"
 
-1425218872 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/oglRenderer.cpp
+1425772419 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/oglRenderer.cpp
 	<iostream>
 	<glm/gtc/type_ptr.hpp>
 	"OGLRenderer.hpp"
@@ -858,10 +860,10 @@
 1424379852 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/SimpleShader.hpp
 	"Shader.hpp"
 
-1424386512 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/Texture2DShader.hpp
+1425772352 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/Texture2DShader.hpp
 	"Shader.hpp"
 
-1425146112 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/sceneNode.cpp
+1425770379 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/sceneNode.cpp
 	<iostream>
 	<glm/gtx/transform.hpp>
 	<glm/gtc/matrix_transform.hpp>
@@ -869,16 +871,16 @@
 	"SceneNode.hpp"
 	"ShaderNode.hpp"
 
-1425146161 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/SceneNode.hpp
+1425770362 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/SceneNode.hpp
 	"Node.hpp"
 	"OGLRenderer.hpp"
 
-1425146186 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/shaderNode.cpp
+1425770031 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/shaderNode.cpp
 	<iostream>
 	"ShaderNode.hpp"
 	"OGLRenderer.hpp"
 
-1425214601 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/world.cpp
+1425772618 source:/home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/world.cpp
 	<iostream>
 	<glm/glm.hpp>
 	<glm/gtc/matrix_transform.hpp>
@@ -931,9 +933,13 @@
 1388871056 /home/rts/Libraries/glm-dev_0.9.5.1-1_all/usr/include/glm/gtc/type_ptr.inl
 	<cstring>
 
-1424626741 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/LightingShader.hpp
+1425772177 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/LightingShader.hpp
 	"Texture2DShader.hpp"
 
-1424906782 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/ShadowShader.hpp
+1425772166 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/ShadowShader.hpp
 	"LightingShader.hpp"
+
+1425772085 /home/rts/C-C++/CodeBlockProjects/Simple-OpenGL-Game/Simple-OpenGL-Game/src/LightSource.hpp
+	<glm/glm.hpp>
+	<glm/gtc/matrix_transform.hpp>
 

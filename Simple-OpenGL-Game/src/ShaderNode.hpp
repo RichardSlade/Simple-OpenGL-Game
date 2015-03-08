@@ -35,7 +35,7 @@ public:
 
 	virtual void 				draw();
 
-	virtual void 				drawShadowMap();
+	virtual void 				depthPass();
 
 	Shader*						getShaderInfo()
 									{ return mShaderInfo; }

@@ -11,10 +11,10 @@ void ShaderNode::draw()
 		mChildren.at(i)->draw();
 }
 
-void ShaderNode::drawShadowMap()
+void ShaderNode::depthPass()
 {
 	// No need to set shader as world class has
 	// already used setupShadowShader()
 	for(unsigned int i = 0; i < mChildren.size(); i++)
-		mChildren.at(i)->drawShadowMap();
+		mChildren.at(i)->depthPass();
 }

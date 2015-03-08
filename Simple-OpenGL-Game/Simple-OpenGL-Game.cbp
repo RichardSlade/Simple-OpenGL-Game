@@ -48,20 +48,10 @@
 		</Linker>
 		<Unit filename="shaders/DepthRTT.frag" />
 		<Unit filename="shaders/DepthRTT.vert" />
-		<Unit filename="shaders/DepthTex.frag" />
-		<Unit filename="shaders/DepthTex.vert" />
-		<Unit filename="shaders/DirectionalLightingTex.frag" />
-		<Unit filename="shaders/DirectionalLightingTex.vert" />
-		<Unit filename="shaders/PointLighting.frag" />
-		<Unit filename="shaders/PointLighting.vert" />
-		<Unit filename="shaders/ShadowMap.frag" />
-		<Unit filename="shaders/ShadowMap.vert" />
-		<Unit filename="shaders/ShadowMapping_SimpleVersion.frag" />
-		<Unit filename="shaders/ShadowMapping_SimpleVersion.vert" />
+		<Unit filename="shaders/DirLighting.frag" />
+		<Unit filename="shaders/DirLighting.vert" />
 		<Unit filename="shaders/Simple.frag" />
 		<Unit filename="shaders/Simple.vert" />
-		<Unit filename="shaders/Texturing2D.frag" />
-		<Unit filename="shaders/Texturing2D.vert" />
 		<Unit filename="src/ComputeMatricesFromInput.hpp" />
 		<Unit filename="src/Controller.hpp" />
 		<Unit filename="src/LightSource.hpp" />

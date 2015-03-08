@@ -11,10 +11,10 @@ void Node::draw()
 		mChildren.at(i)->draw();
 }
 
-void Node::drawShadowMap()
+void Node::depthPass()
 {
 	for(unsigned int i = 0; i < mChildren.size(); i++)
-		mChildren.at(i)->drawShadowMap();
+		mChildren.at(i)->depthPass();
 }
 
 void Node::attachChild(NodeUPtr node)

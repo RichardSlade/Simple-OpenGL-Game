@@ -14,7 +14,7 @@ SceneNode::SceneNode(Node::NodeType nodeType
 							, glm::vec3 pos
 							, glm::vec3 scale
 							, GLuint VAO
-							, GLuint shadowVAO
+							, GLuint depthVAO
 							, GLuint EBO
 							, GLuint numEle
 							, GLuint texID
@@ -23,7 +23,7 @@ SceneNode::SceneNode(Node::NodeType nodeType
 , mOGLRenderer(renderer)
 , mShaderNode(shdrNode)
 , mVAO(VAO)
-, mShadowVAO(shadowVAO)
+, mDepthVAO(depthVAO)
 , mEBO(EBO)
 , mNumElements(numEle)
 , mTexID(texID)
@@ -68,15 +68,15 @@ void SceneNode::draw()
 		mChildren.at(i)->draw();
 }
 
-void SceneNode::drawShadowMap()
+void SceneNode::depthPass()
 {
-   mOGLRenderer.drawShadow(mModelMatrix
-									, mShadowVAO
+   mOGLRenderer.drawDepth(mModelMatrix
+									, mDepthVAO
 									, mEBO
 									, mNumElements);
 
 	for(unsigned int i = 0; i < mChildren.size(); i++)
-		mChildren.at(i)->drawShadowMap();
+		mChildren.at(i)->depthPass();
 }
 
 void SceneNode::setPosition(glm::vec3 pos)

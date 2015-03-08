@@ -55,56 +55,21 @@ void OGLRenderer::loadPrograms()
     };
 
 	// Create and compile our GLSL program from the shaders
-	mShadingProgramID[SimpleProgram] = LoadShaders(shader_info_one);
+	mProgramID[SimpleProgram] = LoadShaders(shader_info_one);
 	mShaderInfo.push_back(Shader::ShaderUPtr(new SimpleShader()));
-
-//	std::cout << "ShaderID: " << mShadingProgramID[SimpleProgram] << std::endl;
 
 	ShaderInfo shader_info_two[] =
     {
-        { GL_VERTEX_SHADER, "shaders/Texturing2D.vert" },
-        { GL_FRAGMENT_SHADER, "shaders/Texturing2D.frag" },
+        { GL_VERTEX_SHADER, "shaders/DirLightingTex.vert" },
+        { GL_FRAGMENT_SHADER, "shaders/DirLightingTex.frag" },
         { GL_NONE, NULL }
     };
 
 	// Create and compile our GLSL program from the shaders
-	mShadingProgramID[Tex2DProgram] = LoadShaders(shader_info_two);
-	mShaderInfo.push_back(Shader::ShaderUPtr(new Texture2DShader()));
+	mProgramID[DirLightProgram] = LoadShaders(shader_info_two);
+	mShaderInfo.push_back(Shader::ShaderUPtr(new LightingShader()));
 
 	ShaderInfo shader_info_three[] =
-    {
-        { GL_VERTEX_SHADER, "shaders/DirectionalLightingTex.vert" },
-        { GL_FRAGMENT_SHADER, "shaders/DirectionalLightingTex.frag" },
-        { GL_NONE, NULL }
-    };
-
-	// Create and compile our GLSL program from the shaders
-	mShadingProgramID[DirLightProgram] = LoadShaders(shader_info_three);
-	mShaderInfo.push_back(Shader::ShaderUPtr(new LightingShader()));
-
-	ShaderInfo shader_info_four[] =
-    {
-        { GL_VERTEX_SHADER, "shaders/PointLighting.vert" },
-        { GL_FRAGMENT_SHADER, "shaders/PointLighting.frag" },
-        { GL_NONE, NULL }
-    };
-
-	// Create and compile our GLSL program from the shaders
-	mShadingProgramID[PntLightProgram] = LoadShaders(shader_info_four);
-	mShaderInfo.push_back(Shader::ShaderUPtr(new LightingShader()));
-
-	ShaderInfo shader_info_five[] =
-	{
-        { GL_VERTEX_SHADER, "shaders/ShadowMapping_SimpleVersion.vert" },
-        { GL_FRAGMENT_SHADER, "shaders/ShadowMapping_SimpleVersion.frag" },
-        { GL_NONE, NULL }
-	};
-
-	// Create and compile our GLSL program from the shaders
-	mShadingProgramID[ShadowProgram] = LoadShaders(shader_info_five);
-	mShaderInfo.push_back(Shader::ShaderUPtr(new ShadowShader()));
-
-	ShaderInfo shader_info_six[] =
 	{
         { GL_VERTEX_SHADER, "shaders/DepthRTT.vert" },
         { GL_FRAGMENT_SHADER, "shaders/DepthRTT.frag" },
@@ -112,24 +77,8 @@ void OGLRenderer::loadPrograms()
 	};
 
 	// Create and compile our GLSL program from the shaders
-	mShadingProgramID[DepthProgram] = LoadShaders(shader_info_six);
+	mProgramID[DepthProgram] = LoadShaders(shader_info_three);
 	mShaderInfo.push_back(Shader::ShaderUPtr(new ShadowShader()));
-
-
-
-	ShaderInfo shader_info_seven[] =
-	{
-        { GL_VERTEX_SHADER, "shaders/ShadowMap.vert" },
-        { GL_FRAGMENT_SHADER, "shaders/ShadowMap.frag" },
-        { GL_NONE, NULL }
-	};
-
-	// Create and compile our GLSL program from the shaders
-	mShadingProgramID[DepthTexProgram] = LoadShaders(shader_info_seven);
-//	mShaderInfo.push_back(Shader::ShaderUPtr(new ShadowShader()));
-
-	std::cout << "Depth Tex ID: " << mShadingProgramID[DepthTexProgram] << std::endl;
-
 
 	allocProgramUniforms();
 }
@@ -207,7 +156,7 @@ bool OGLRenderer::loadTextures(sf::Vector2u windowSize)
 	glGenFramebuffers(1, &mFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
 
-//	glDrawBuffer(GL_NONE);
+	glDrawBuffer(GL_NONE);
 //	glReadBuffer(GL_NONE);
 
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT
@@ -242,102 +191,8 @@ bool OGLRenderer::loadWorldData(World *world)
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeNormBuf]);
 	glBufferData(GL_ARRAY_BUFFER, cubeMesh->normalNum * sizeof(glm::vec3), &cubeMesh->normals[0], GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeTexBuf]);
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeUVBuf]);
 	glBufferData(GL_ARRAY_BUFFER, cubeMesh->texCordNum * sizeof(glm::vec2), &cubeMesh->texCords[0], GL_STATIC_DRAW);
-
-	// Cube Directional light
-	glBindVertexArray(mVAO[CubeDirLightVAO]);
-
-	LightingShader *lightShader = dynamic_cast<LightingShader*>(mShaderInfo.at(DirLightProgram).get());
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeVertBuf]);
-	glVertexAttribPointer(lightShader->Position
-								, 4
-								, GL_FLOAT
-								, GL_FALSE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(lightShader->Position);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeTexBuf]);
-	glVertexAttribPointer(lightShader->UV
-								, 2
-								, GL_FLOAT
-								, GL_TRUE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(lightShader->UV);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeNormBuf]);
-	glVertexAttribPointer(lightShader->Normal
-								, 3
-								, GL_FLOAT
-								, GL_TRUE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(lightShader->Normal);
-
-	// Cube Point light
-	glBindVertexArray(mVAO[CubeDirLightVAO]);
-
-	lightShader = dynamic_cast<LightingShader*>(mShaderInfo.at(PntLightProgram).get());
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeVertBuf]);
-	glVertexAttribPointer(lightShader->Position
-								, 4
-								, GL_FLOAT
-								, GL_FALSE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(lightShader->Position);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeTexBuf]);
-	glVertexAttribPointer(lightShader->UV
-								, 2
-								, GL_FLOAT
-								, GL_TRUE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(lightShader->UV);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeNormBuf]);
-	glVertexAttribPointer(lightShader->Normal
-								, 3
-								, GL_FLOAT
-								, GL_TRUE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(lightShader->Normal);
-
-	glBindVertexArray(mVAO[CubeShadowVAO]);
-
-	ShadowShader *shadowShader = dynamic_cast<ShadowShader*>(mShaderInfo.at(DepthProgram).get());
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeVertBuf]);
-	glVertexAttribPointer(shadowShader->Position
-								, 4
-								, GL_FLOAT
-								, GL_FALSE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(shadowShader->Position);
-
-//	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeTexBuf]);
-//	glVertexAttribPointer(shadowShader->UV
-//								, 4
-//								, GL_FLOAT
-//								, GL_FALSE
-//								, 0
-//								, (void*)0);
-//
-//	glEnableVertexAttribArray(shadowShader->UV);
 
 	// Load Earth mesh data
 	OBJMesh *earthMesh = world->getObject(World::MeshType::Earth);
@@ -351,92 +206,10 @@ bool OGLRenderer::loadWorldData(World *world)
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthNormBuf]);
 	glBufferData(GL_ARRAY_BUFFER, earthMesh->normalNum * sizeof(glm::vec3), &earthMesh->normals[0], GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthTexBuf]);
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthUVBuf]);
 	glBufferData(GL_ARRAY_BUFFER, earthMesh->texCordNum * sizeof(glm::vec2), &earthMesh->texCords[0], GL_STATIC_DRAW);
 
-	// Earth Directional shader VAO
-	glBindVertexArray(mVAO[EarthDirLightVAO]);
-
-	lightShader = dynamic_cast<LightingShader*>(mShaderInfo.at(DirLightProgram).get());
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthVertBuf]);
-	glVertexAttribPointer(lightShader->Position
-								, 4
-								, GL_FLOAT
-								, GL_FALSE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(lightShader->Position);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthTexBuf]);
-	glVertexAttribPointer(lightShader->UV
-								, 2
-								, GL_FLOAT
-								, GL_TRUE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(lightShader->UV);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthNormBuf]);
-	glVertexAttribPointer(lightShader->Normal
-								, 3
-								, GL_FLOAT
-								, GL_TRUE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(lightShader->Normal);
-
-	// Data for Pnt light earth
-	glBindVertexArray(mVAO[EarthPntLightVAO]);
-
-	lightShader = dynamic_cast<LightingShader*>(mShaderInfo.at(PntLightProgram).get());
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthVertBuf]);
-	glVertexAttribPointer(lightShader->Position
-								, 4
-								, GL_FLOAT
-								, GL_FALSE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(lightShader->Position);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthTexBuf]);
-	glVertexAttribPointer(lightShader->UV
-								, 2
-								, GL_FLOAT
-								, GL_TRUE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(lightShader->UV);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthNormBuf]);
-	glVertexAttribPointer(lightShader->Normal
-								, 3
-								, GL_FLOAT
-								, GL_TRUE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(lightShader->Normal);
-
-	glBindVertexArray(mVAO[EarthShadowVAO]);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthVertBuf]);
-	glVertexAttribPointer(shadowShader->Position
-								, 4
-								, GL_FLOAT
-								, GL_FALSE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(shadowShader->Position);
-
-	// Data for lights
+		// Data for lights
 	std::vector<glm::vec4> lightColours;
 
 	for(unsigned int i = 0; i < earthMesh->vertNum; i++)
@@ -445,37 +218,17 @@ bool OGLRenderer::loadWorldData(World *world)
    glBindBuffer(GL_ARRAY_BUFFER, mVBO[LightColBuf]);
    glBufferData(GL_ARRAY_BUFFER, lightColours.size() * sizeof(glm::vec4), &lightColours[0], GL_STATIC_DRAW);
 
-	glBindVertexArray(mVAO[LightVAO]);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthVertBuf]);
-	glVertexAttribPointer(mShaderInfo.at(SimpleProgram)->Position
-								, 4
-								, GL_FLOAT
-								, GL_FALSE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(mShaderInfo.at(SimpleProgram)->Position);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[LightColBuf]);
-	glVertexAttribPointer(mShaderInfo.at(SimpleProgram)->Colour
-								, 4
-								, GL_FLOAT
-								, GL_TRUE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(mShaderInfo.at(SimpleProgram)->Colour);
-
-	// Data for plane used as floor
+   // Data for plane used as floor
 	std::vector<glm::vec4> planeColours;
 
 	// Colour green for grass
 	for(unsigned int i = 0; i < earthMesh->vertNum; i++)
 		planeColours.push_back(glm::vec4(0, 1, 0.25, 1));
 
-   glBindBuffer(GL_ARRAY_BUFFER, mVBO[PlaneColBuf]);
-   glBufferData(GL_ARRAY_BUFFER, planeColours.size() * sizeof(glm::vec4), &planeColours[0], GL_STATIC_DRAW);
+	std::vector<glm::vec3> planeNorms;
+
+	for(int i = 0; i < 6; i++)
+		planeNorms.push_back(glm::vec3(0, 1, 0));
 
 	const GLfloat planeVerts[] =
 	{
@@ -494,198 +247,222 @@ bool OGLRenderer::loadWorldData(World *world)
 	glBindBuffer(GL_ARRAY_BUFFER, mVBO[PlaneVertBuf]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(planeVerts), planeVerts, GL_STATIC_DRAW);
 
+   glBindBuffer(GL_ARRAY_BUFFER, mVBO[PlaneColBuf]);
+   glBufferData(GL_ARRAY_BUFFER, planeColours.size() * sizeof(glm::vec4), &planeColours[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[PlaneNormBuf]);
+   glBufferData(GL_ARRAY_BUFFER, planeNorms.size() * sizeof(glm::vec3), &planeNorms[0], GL_STATIC_DRAW);
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO[PlaneEBO]);
    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(planeEle), planeEle, GL_STATIC_DRAW);
 
-	glBindVertexArray(mVAO[PlaneVAO]);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[PlaneVertBuf]);
-	glVertexAttribPointer(mShaderInfo.at(SimpleProgram)->Position
-								, 4
-								, GL_FLOAT
-								, GL_FALSE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(mShaderInfo.at(SimpleProgram)->Position);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[PlaneColBuf]);
-	glVertexAttribPointer(mShaderInfo.at(SimpleProgram)->Colour
-								, 4
-								, GL_FLOAT
-								, GL_TRUE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(mShaderInfo.at(SimpleProgram)->Colour);
-
-	glBindVertexArray(mVAO[PlaneShadowVAO]);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[PlaneVertBuf]);
-	glVertexAttribPointer(mShaderInfo.at(DepthProgram)->Position
-								, 4
-								, GL_FLOAT
-								, GL_FALSE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(mShaderInfo.at(DepthProgram)->Position);
-
-	glBindVertexArray(mVAO[ShadowMapVAO]);
-
-	GLfloat quadVerts[] =
-	{
-		-1.f, -1.f, 0.f, 1.f,
-		1.f, -1.f, 0.f, 1.f,
-		-1.f, 1.f, 0.f, 1.f,
-
-		-1.f, 1.f, 0.f, 1.f,
-		1.f, -1.f, 0.f, 1.f,
-		1.f, 1.f, 0.f, 1.f,
-	};
-
-	GLfloat quadUV[] =
-	{
-		-1.f, -1.f,
-		1.f, -1.f,
-		-1.f, 1.f,
-
-		-1.f, 1.f,
-		1.f, -1.f,
-		1.f, 1.f,
-	};
-
-	GLfloat quadCol[] =
-	{
-		0.f, 0.f, 1.f, 1.f,
-		0.f, 0.f, 1.f, 1.f,
-		0.f, 0.f, 1.f, 1.f,
-
-		0.f, 1.f, 0.f, 1.f,
-		0.f, 1.f, 0.f, 1.f,
-		0.f, 1.f, 0.f, 1.f,
-	};
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[QuadVertBuf]);
-	glBufferData(GL_ARRAY_BUFFER, 4 * 6 * sizeof(GLfloat), &quadVerts[0], GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[QuadColBuf]);
-	glBufferData(GL_ARRAY_BUFFER, 4 * 6 * sizeof(GLfloat), &quadCol[0], GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[QuadUVBuf]);
-	glBufferData(GL_ARRAY_BUFFER, 2 * 6 * sizeof(GLfloat), &quadUV[0], GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[QuadVertBuf]);
-	glVertexAttribPointer(0
-								, 4
-								, GL_FLOAT
-								, GL_TRUE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[QuadColBuf]);
-	glVertexAttribPointer(1
-								, 4
-								, GL_FLOAT
-								, GL_TRUE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(1);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mVBO[QuadUVBuf]);
-	glVertexAttribPointer(2
-								, 2
-								, GL_FLOAT
-								, GL_FALSE
-								, 0
-								, (void*)0);
-
-	glEnableVertexAttribArray(2);
-
-	glBindVertexArray(0);
+	setupVAO();
 
 	return true;
+}
+
+void OGLRenderer::setupVAO()
+{
+	// Cube Directional light
+	glBindVertexArray(mVAO[CubeDirLightVAO]);
+
+	LightingShader *lightShader = dynamic_cast<LightingShader*>(mShaderInfo.at(DirLightProgram).get());
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeVertBuf]);
+	glVertexAttribPointer(lightShader->position
+								, 4
+								, GL_FLOAT
+								, GL_FALSE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(lightShader->position);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeUVBuf]);
+	glVertexAttribPointer(lightShader->UV
+								, 2
+								, GL_FLOAT
+								, GL_TRUE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(lightShader->UV);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeNormBuf]);
+	glVertexAttribPointer(lightShader->normal
+								, 3
+								, GL_FLOAT
+								, GL_TRUE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(lightShader->normal);
+
+	// Cube depth
+	glBindVertexArray(mVAO[CubeDepthVAO]);
+
+	ShadowShader *shadowShader = dynamic_cast<ShadowShader*>(mShaderInfo.at(DepthProgram).get());
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[CubeVertBuf]);
+	glVertexAttribPointer(shadowShader->position
+								, 4
+								, GL_FLOAT
+								, GL_FALSE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(shadowShader->position);
+
+	// Earth Directional shader VAO
+	glBindVertexArray(mVAO[EarthDirLightVAO]);
+
+	lightShader = dynamic_cast<LightingShader*>(mShaderInfo.at(DirLightProgram).get());
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthVertBuf]);
+	glVertexAttribPointer(lightShader->position
+								, 4
+								, GL_FLOAT
+								, GL_FALSE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(lightShader->position);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthUVBuf]);
+	glVertexAttribPointer(lightShader->UV
+								, 2
+								, GL_FLOAT
+								, GL_TRUE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(lightShader->UV);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthNormBuf]);
+	glVertexAttribPointer(lightShader->normal
+								, 3
+								, GL_FLOAT
+								, GL_TRUE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(lightShader->normal);
+
+	// Earth depth
+	glBindVertexArray(mVAO[EarthDepthVAO]);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthVertBuf]);
+	glVertexAttribPointer(shadowShader->position
+								, 4
+								, GL_FLOAT
+								, GL_FALSE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(shadowShader->position);
+
+	// Light VAO
+	glBindVertexArray(mVAO[LightVAO]);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[EarthVertBuf]);
+	glVertexAttribPointer(mShaderInfo.at(SimpleProgram)->position
+								, 4
+								, GL_FLOAT
+								, GL_FALSE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(mShaderInfo.at(SimpleProgram)->position);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[LightColBuf]);
+	glVertexAttribPointer(mShaderInfo.at(SimpleProgram)->colour
+								, 4
+								, GL_FLOAT
+								, GL_TRUE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(mShaderInfo.at(SimpleProgram)->colour);
+
+	// Plane VAO
+	glBindVertexArray(mVAO[PlaneDirLightVAO]);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[PlaneVertBuf]);
+	glVertexAttribPointer(lightShader->position
+								, 4
+								, GL_FLOAT
+								, GL_FALSE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(lightShader->position);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[PlaneUVBuf]);
+	glVertexAttribPointer(lightShader->UV
+								, 2
+								, GL_FLOAT
+								, GL_TRUE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(lightShader->UV);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[PlaneNormBuf]);
+	glVertexAttribPointer(lightShader->normal
+								, 3
+								, GL_FLOAT
+								, GL_TRUE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(lightShader->normal);
+
+	// Plane depth
+	glBindVertexArray(mVAO[PlaneDepthVAO]);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mVBO[PlaneVertBuf]);
+	glVertexAttribPointer(mShaderInfo.at(DepthProgram)->position
+								, 4
+								, GL_FLOAT
+								, GL_FALSE
+								, 0
+								, (void*)0);
+
+	glEnableVertexAttribArray(mShaderInfo.at(DepthProgram)->position);
+
+	glBindVertexArray(0);
 }
 
 void OGLRenderer::allocProgramUniforms()
 {
 	// Simple Shader uniforms
-	mShaderInfo.at(SimpleProgram)->MVP = glGetUniformLocation(mShadingProgramID[SimpleProgram], "MVP");
+	mShaderInfo.at(SimpleProgram)->MVP = glGetUniformLocation(mProgramID[SimpleProgram], "MVP");
 
 	// Simple Shader variables
-	mShaderInfo.at(SimpleProgram)->Position = glGetAttribLocation(mShadingProgramID[SimpleProgram], "vPosition");
-	mShaderInfo.at(SimpleProgram)->Colour = glGetAttribLocation(mShadingProgramID[SimpleProgram], "vColour");
-
-	Texture2DShader *tex2DShader = dynamic_cast<Texture2DShader*>(mShaderInfo.at(Tex2DProgram).get());
-
-	// Texture shader uniforms
-	tex2DShader->MVP = glGetUniformLocation(mShadingProgramID[Tex2DProgram], "MVP");
-	tex2DShader->Sampler = glGetUniformLocation(mShadingProgramID[Tex2DProgram], "Tex2DSampler");
-
-	// Texture shader variables
-	tex2DShader->Position = glGetAttribLocation(mShadingProgramID[Tex2DProgram], "vPosition");
-	tex2DShader->UV = glGetAttribLocation(mShadingProgramID[Tex2DProgram], "vUV");
-
-	LightingShader *lightShader = dynamic_cast<LightingShader*>(mShaderInfo.at(DirLightProgram).get());
+	mShaderInfo.at(SimpleProgram)->position = glGetAttribLocation(mProgramID[SimpleProgram], "vPosition");
+	mShaderInfo.at(SimpleProgram)->colour = glGetAttribLocation(mProgramID[SimpleProgram], "vColour");
 
 	// Directional lighting shader uniforms
-	lightShader->MVP = glGetUniformLocation(mShadingProgramID[DirLightProgram], "MVP");
-//	dirLightShader->MV = glGetUniformLocation(mShadingProgramID[DirLightProgram], "MV");
-	lightShader->NormalMatrix = glGetUniformLocation(mShadingProgramID[DirLightProgram], "NormalMatrix");
-//	dirLightShader->LightPosition = glGetUniformLocation(mShadingProgramID[DirLightProgram], "LightPosition");
-	lightShader->LightDirection = glGetUniformLocation(mShadingProgramID[DirLightProgram], "LightDirection");
-//	dirLightShader->ViewDirection = glGetUniformLocation(mShadingProgramID[DirLightProgram], "ViewDirection");
-	lightShader->HalfVector = glGetUniformLocation(mShadingProgramID[DirLightProgram], "HalfVector");
-	lightShader->Sampler = glGetUniformLocation(mShadingProgramID[DirLightProgram], "Tex2DSampler");
+	LightingShader *lightShader = dynamic_cast<LightingShader*>(mShaderInfo.at(DirLightProgram).get());
+
+	lightShader->M = glGetUniformLocation(mProgramID[DirLightProgram], "M");
+	lightShader->V = glGetUniformLocation(mProgramID[DirLightProgram], "V");
+	lightShader->P = glGetUniformLocation(mProgramID[DirLightProgram], "P");
+	lightShader->shadowMatrix = glGetUniformLocation(mProgramID[DirLightProgram], "ShadowMatrix");
+	lightShader->lightPosition = glGetUniformLocation(mProgramID[DirLightProgram], "LightPosition");
+	lightShader->shadowSampler = glGetUniformLocation(mProgramID[DirLightProgram], "ShadowSampler");
+	lightShader->sampler = glGetUniformLocation(mProgramID[DirLightProgram], "Tex2DSampler");
 
 	// Directional lighting shader variables
-	lightShader->Position = glGetAttribLocation(mShadingProgramID[DirLightProgram], "vPosition");
-	lightShader->UV = glGetAttribLocation(mShadingProgramID[DirLightProgram], "vUV");
-	lightShader->Normal = glGetAttribLocation(mShadingProgramID[DirLightProgram], "vNormal");
+	lightShader->position = glGetAttribLocation(mProgramID[DirLightProgram], "vPosition");
+	lightShader->UV = glGetAttribLocation(mProgramID[DirLightProgram], "vUV");
+	lightShader->normal = glGetAttribLocation(mProgramID[DirLightProgram], "vNormal");
 
-//	lightShader = nullptr;
-	lightShader = dynamic_cast<LightingShader*>(mShaderInfo.at(PntLightProgram).get());
+	// Depth program
+	ShadowShader *shadowShader = dynamic_cast<ShadowShader*>(mShaderInfo.at(DepthProgram).get());
 
-	// Point lighting shader uniforms
-	lightShader->MVP = glGetUniformLocation(mShadingProgramID[PntLightProgram], "MVP");
-	lightShader->MV = glGetUniformLocation(mShadingProgramID[PntLightProgram], "MV");
-	lightShader->NormalMatrix = glGetUniformLocation(mShadingProgramID[PntLightProgram], "NormalMatrix");
-	lightShader->LightPosition = glGetUniformLocation(mShadingProgramID[PntLightProgram], "LightPosition");
-	lightShader->EyeDirection = glGetUniformLocation(mShadingProgramID[PntLightProgram], "EyeDirection");
-	lightShader->Sampler = glGetUniformLocation(mShadingProgramID[PntLightProgram], "Tex2DSampler");
-
-	// Pntectional lighting shader variables
-	lightShader->Position = glGetAttribLocation(mShadingProgramID[PntLightProgram], "vPosition");
-	lightShader->UV = glGetAttribLocation(mShadingProgramID[PntLightProgram], "vUV");
-	lightShader->Normal = glGetAttribLocation(mShadingProgramID[PntLightProgram], "vNormal");
-
-	// Shadow program
-	ShadowShader *shadowShader = dynamic_cast<ShadowShader*>(mShaderInfo.at(ShadowProgram).get());
-
-	shadowShader->MVP = glGetUniformLocation(mShadingProgramID[ShadowProgram], "MVP");
-	shadowShader->DepthMVP = glGetUniformLocation(mShadingProgramID[ShadowProgram], "DepthBiasMVP");
-//	shadowShader->Sampler = glGetUniformLocation(mShadingProgramID[ShadowProgram], "Tex2DSample");
-	shadowShader->ShadowSampler = glGetUniformLocation(mShadingProgramID[ShadowProgram], "ShadowSampler");
-
-	shadowShader->Position = glGetAttribLocation(mShadingProgramID[ShadowProgram], "vPosition");
-	// Depth programs
-	shadowShader = dynamic_cast<ShadowShader*>(mShaderInfo.at(DepthProgram).get());
-
-	shadowShader->DepthMVP = glGetUniformLocation(mShadingProgramID[DepthProgram], "DepthMVP");
-	shadowShader->Position = glGetAttribLocation(mShadingProgramID[DepthProgram], "vPosition");
-
-
-//	shadowShader->UV = glGetAttribLocation(mShadingProgramID[ShadowProgram], "vUV");
-//	shadowShader->Normal = glGetAttribLocation(mShadingProgramID[ShadowProgram], "vNormal");
-
-//	std::cout << "Depth Tex ID: " << mShadingProgramID[DepthTexProgram] << std::endl;
-
-//	GLuint tex2DsamplerID = glGetUniformLocation(mShadingProgramID[DepthTexProgram], "Tex2DSampler");
-//	GLuint tex2DsamplerID = glGetUniformLocation(mShadingProgramID[ShadowProgram], "ShadowSampler");
-
+	shadowShader->depthMVP = glGetUniformLocation(mProgramID[DepthProgram], "DepthMVP");
+	shadowShader->position = glGetAttribLocation(mProgramID[DepthProgram], "vPosition");
 }
 
 bool OGLRenderer::checkFramebuffer(GLenum status)
@@ -757,7 +534,7 @@ void OGLRenderer::cleanUp()
 	glDeleteBuffers(NumEBO, &mEBO[0]);
 
 	for(int i = 0; i < NumPrograms; i++)
-		glDeleteProgram(mShadingProgramID[i]);
+		glDeleteProgram(mProgramID[i]);
 }
 
 unsigned int OGLRenderer::texTargetToUInt(GLenum texTarget)
@@ -767,6 +544,7 @@ unsigned int OGLRenderer::texTargetToUInt(GLenum texTarget)
 		case GL_TEXTURE0: return 0;
 		case GL_TEXTURE1: return 1;
 		case GL_TEXTURE2: return 2;
+		case GL_TEXTURE3: return 3;
 		default: return 999;
 	}
 }
@@ -775,29 +553,40 @@ void OGLRenderer::clearContext(bool isShadowPass)
 {
 //	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	if(isShadowPass)
-//		glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
-
 	glClearColor(0.3f, 0.3f, 0.5f, 1.f);
-   glEnable(GL_CULL_FACE);
 
    if(isShadowPass)
 	{
-//		glCullFace(GL_FRONT | GL_BACK);
 		glClear(GL_DEPTH_BUFFER_BIT);
 	}
 	else
 	{
-		glCullFace(GL_BACK);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 }
 
-void OGLRenderer::setupDepthPass(glm::mat4 lightView
-											, glm::mat4 lightProj)
+void OGLRenderer::setupDepthPass()
 {
-	mLightViewMatrix = lightView;
-	mLightProjMatrix = lightProj;
+	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+//	glCullFace(GL_FRONT);
+	glEnable(GL_POLYGON_OFFSET_FILL);
+
+	glViewport(0, 0, mWindow->getSize().x * 2, mWindow->getSize().y * 2);
+	glCullFace(GL_FRONT);
+
+	glUseProgram(mProgramID[DepthProgram]);
+}
+
+void OGLRenderer::finishDepthPass()
+{
+	glDisable(GL_POLYGON_OFFSET_FILL);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0,  mWindow->getSize().x, mWindow->getSize().y);
+
+	glCullFace(GL_BACK);
 }
 
 void OGLRenderer::setupShader(int shaderID)
@@ -805,48 +594,44 @@ void OGLRenderer::setupShader(int shaderID)
 	glUseProgram(shaderID);
 }
 
-void OGLRenderer::drawShadowMap()
-{
-	glUseProgram(mShadingProgramID[DepthTexProgram]);
-	glBindVertexArray(mVAO[ShadowMapVAO]);
+//void OGLRenderer::drawShadowMap()
+//{
+//	glUseProgram(mProgramID[DepthTexProgram]);
+//	glBindVertexArray(mVAO[ShadowMapVAO]);
+//
+//	GLuint tex2DsamplerID = glGetUniformLocation(mProgramID[DepthTexProgram], "Tex2DSampler");
+//
+////	glUniform1i(1, 2);
+//	glUniform1i(tex2DsamplerID, texTargetToUInt(mTexTargets[DepthTex]));
+////	glUniform1i(tex2DsamplerID, texTargetToUInt(mTexTargets[WoodBoxTex]));
+//	glActiveTexture(mTexTargets[DepthTex]);
+////	glActiveTexture(mTexTargets[WoodBoxTex]);
+////	glActiveTexture(GL_TEXTURE2);
+////	glBindTexture(GL_TEXTURE_2D, mTex[WoodBoxTex]);
+//	glBindTexture(GL_TEXTURE_2D, mTex[DepthTex]);
+//
+//	glDrawArrays(GL_TRIANGLES, 0, 6);
+//}
 
-	GLuint tex2DsamplerID = glGetUniformLocation(mShadingProgramID[DepthTexProgram], "Tex2DSampler");
-
-//	glUniform1i(1, 2);
-	glUniform1i(tex2DsamplerID, texTargetToUInt(mTexTargets[DepthTex]));
-//	glUniform1i(tex2DsamplerID, texTargetToUInt(mTexTargets[WoodBoxTex]));
-	glActiveTexture(mTexTargets[DepthTex]);
-//	glActiveTexture(mTexTargets[WoodBoxTex]);
-//	glActiveTexture(GL_TEXTURE2);
-//	glBindTexture(GL_TEXTURE_2D, mTex[WoodBoxTex]);
-	glBindTexture(GL_TEXTURE_2D, mTex[DepthTex]);
-
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-}
-
-void OGLRenderer::drawShadow(glm::mat4 M
+void OGLRenderer::drawDepth(glm::mat4 M
 									 , GLuint VAO
 									 , GLuint EBO
 									 , GLuint numElements
 )
 {
-	glBindVertexArray(VAO);
-	glBindFramebuffer(GL_FRAMEBUFFER, mFBO);
-
-	glm::mat4 depthMVP = mPlayerProjMatrix * mPlayerViewMatrix * M;
+	glm::mat4 depthMVP = mDirLightSource->P * mDirLightSource->V * M;
 
 	ShadowShader* shadowShader = dynamic_cast<ShadowShader*>(mShaderInfo.at(DepthProgram).get());
-	glUniformMatrix4fv(shadowShader->DepthMVP, 1, GL_FALSE, &depthMVP[0][0]);
+	glUniformMatrix4fv(shadowShader->depthMVP, 1, GL_FALSE, &depthMVP[0][0]);
 
+	glBindVertexArray(VAO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glDrawElements(GL_TRIANGLES, numElements, GL_UNSIGNED_SHORT, NULL);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void OGLRenderer::draw(//glm::mat4 MVP
-							//, glm::mat4 MV
-							 glm::mat4 M
+void OGLRenderer::draw(glm::mat4 M
 							, GLuint VAO
 							, GLuint EBO
 							, GLuint numElements
@@ -856,75 +641,28 @@ void OGLRenderer::draw(//glm::mat4 MVP
 							, Programs progType)
 {
 	glBindVertexArray(VAO);
-
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
-	glm::mat4 MVP = mPlayerProjMatrix * mPlayerViewMatrix * M;
-	glm::mat4 MV = mPlayerViewMatrix * M;
+	glm::mat4 P = getProjectionMatrix();
+	glm::mat4 V = getViewMatrix();
 
 	switch(progType)
 	{
 		case SimpleProgram:
 		{
 			SimpleShader *shdr = dynamic_cast<SimpleShader*>(mShaderInfo.at(SimpleProgram).get());
-			glUniformMatrix4fv(shdr->MVP, 1, GL_FALSE, &MVP[0][0]);
-			break;
-		}
-		case Tex2DProgram:
-		{
-			Texture2DShader *shdr = dynamic_cast<Texture2DShader*>(mShaderInfo.at(Tex2DProgram).get());
-			glUniformMatrix4fv(shdr->MVP, 1, GL_FALSE, &MVP[0][0]);
 
-			glUniform1i(shdr->Sampler, texTargetToUInt(texTarget));
-			glActiveTexture(texTarget);
-			glBindTexture(GL_TEXTURE_2D, texID);
-
+			glm::mat4 MVP = P * V * M;
+			glUniformMatrix4fv(shdr->MVP, 1, GL_FALSE, &MVP[0][0]);
 			break;
 		}
 		case DirLightProgram:
 		{
 			LightingShader *shdr = dynamic_cast<LightingShader*>(mShaderInfo.at(DirLightProgram).get());
-			glUniformMatrix4fv(shdr->MVP, 1, GL_FALSE, &MVP[0][0]);
 
-			glm::mat3 normMatrix(MV);
-			glUniformMatrix3fv(shdr->NormalMatrix, 1, GL_FALSE, &normMatrix[0][0]);
-
-			glm::vec3 lightDirection(glm::normalize(MV * glm::vec4(-*mDirLightSource, 0)));
-			glUniform3fv(shdr->LightDirection, 1, glm::value_ptr(lightDirection));
-
-			glm::vec3 eyeDir = glm::vec3(MV * glm::vec4(getViewDirection(), 0));
-
-			glm::vec3 halfVec = glm::normalize(eyeDir + lightDirection);
-			glUniform3fv(shdr->HalfVector, 1, &halfVec[0]);
-
-			glUniform1i(shdr->Sampler, texTargetToUInt(texTarget));
-			glActiveTexture(texTarget);
-			glBindTexture(GL_TEXTURE_2D, texID);
-
-			break;
-		}
-		case PntLightProgram:
-		{
-			LightingShader *shdr = dynamic_cast<LightingShader*>(mShaderInfo.at(PntLightProgram).get());
-			glUniformMatrix4fv(shdr->MVP, 1, GL_FALSE, &MVP[0][0]);
-			glUniformMatrix4fv(shdr->MV, 1, GL_FALSE, &MV[0][0]);
-
-			glm::mat3 normMatrix(MV);
-			glUniformMatrix3fv(shdr->NormalMatrix, 1, GL_FALSE, &normMatrix[0][0]);
-
-			glUniform3fv(shdr->LightPosition, 1, glm::value_ptr(MV * glm::vec4(-mPntLightSources->at(0), 1)));
-			glUniform3fv(shdr->EyeDirection, 1, glm::value_ptr(MV * glm::vec4(getViewDirection(), 0)));
-
-			glUniform1i(shdr->Sampler, texTargetToUInt(texTarget));
-			glActiveTexture(texTarget);
-			glBindTexture(GL_TEXTURE_2D, texID);
-
-			break;
-		}
-		case ShadowProgram:
-		{
-			ShadowShader *shdr = dynamic_cast<ShadowShader*>(mShaderInfo.at(ShadowProgram).get());
-			glUniformMatrix4fv(shdr->MVP, 1, GL_FALSE, &MVP[0][0]);
+			glUniformMatrix4fv(shdr->P, 1, GL_FALSE, &P[0][0]);
+			glUniformMatrix4fv(shdr->V, 1, GL_FALSE, &V[0][0]);
+			glUniformMatrix4fv(shdr->M, 1, GL_FALSE, &M[0][0]);
 
 			glm::mat4 biasMatrix(
 				0.5, 0.0, 0.0, 0.0,
@@ -933,20 +671,41 @@ void OGLRenderer::draw(//glm::mat4 MVP
 				0.5, 0.5, 0.5, 1.0
 			);
 
-//			glm::mat4 biasDepthMVP = glm::mat4(1);
-			glm::mat4 biasDepthMVP = mLightProjMatrix * mLightViewMatrix * M;
+			glm::mat4 depthMVP = mDirLightSource->P * mDirLightSource->V * M;
+			depthMVP = biasMatrix * depthMVP;
+			glUniformMatrix4fv(shdr->shadowMatrix, 1, GL_FALSE, &depthMVP[0][0]);
+
+			glUniform1i(shdr->shadowSampler, texTargetToUInt(mTexTargets[DepthTex]));
+			glActiveTexture(mTexTargets[DepthTex]);
+			glBindTexture(GL_TEXTURE_2D, mTex[DepthTex]);
+
+			glm::vec3 lightDirection(glm::normalize(glm::mat3(V) * -mDirLightSource->position));
+			glUniform3fv(shdr->lightPosition, 1, &lightDirection[0]);
+
+			glUniform1i(shdr->sampler, texTargetToUInt(texTarget));
+			glActiveTexture(texTarget);
+			glBindTexture(GL_TEXTURE_2D, texID);
+
+			break;
+		}
+		case DepthProgram:
+		{
+			ShadowShader *shdr = dynamic_cast<ShadowShader*>(mShaderInfo.at(DepthProgram).get());
+//			glUniformMatrix4fv(shdr->MVP, 1, GL_FALSE, &MVP[0][0]);
+
+			glm::mat4 biasMatrix(
+				0.5, 0.0, 0.0, 0.0,
+				0.0, 0.5, 0.0, 0.0,
+				0.0, 0.0, 0.5, 0.0,
+				0.5, 0.5, 0.5, 1.0
+			);
+
+//			glm::mat4 biasDepthMVP = mLightProjMatrix * mLightViewMatrix * M;
+			glm::mat4 biasDepthMVP = mDirLightSource->P * mDirLightSource->V * M;
 			biasDepthMVP = biasMatrix * biasDepthMVP;
-//			glm::mat4 biasDepthMVP = biasMatrix * mDepthMVP;
-         glUniformMatrix4fv(shdr->DepthMVP, 1, GL_FALSE, &biasDepthMVP[0][0]);
+         glUniformMatrix4fv(shdr->depthMVP, 1, GL_FALSE, &biasDepthMVP[0][0]);
 
-//         glm::mat3 normMatrix(MV);
-//         glUniformMatrix3fv(shdr->NormalMatrix, 1, GL_FALSE, &normMatrix[0][0]);
-
-//			glUniform1i(shdr->Sampler, texID - 1);
-//			glActiveTexture(texTarget);
-//			glBindTexture(GL_TEXTURE_2D, texID);
-
-			glUniform1i(shdr->ShadowSampler, texTargetToUInt(mTexTargets[DepthTex]));
+			glUniform1i(shdr->shadowSampler, texTargetToUInt(mTexTargets[DepthTex]));
 			glActiveTexture(mTexTargets[DepthTex]);
 			glBindTexture(GL_TEXTURE_2D, mTex[DepthTex]);
 
@@ -978,21 +737,8 @@ OGLRenderer::WindowUPtr OGLRenderer::createWindow()
 
     newWindow->setActive();
 
+    mWindow = newWindow.get();
+
 	return std::move(newWindow);
-}
-
-void OGLRenderer::setPlayerVPMatrices()
-{
-	mPlayerProjMatrix = getProjectionMatrix();
-	mPlayerViewMatrix = getViewMatrix();
-//	mVPMatrix = mPMatrix * mVMatrix;
-}
-
-void OGLRenderer::setLightVPMatrices(glm::mat4 view
-												, glm::mat4 proj)
-{
-	mLightProjMatrix = proj;
-	mLightViewMatrix = view;
-//	mVPMatrix = mPMatrix * mVMatrix;
 }
 

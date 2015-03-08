@@ -7,7 +7,7 @@ struct Texture2DShader : public Shader
 {
 public:
 	GLint 			UV;
-	GLint				Sampler;
+	GLint				sampler;
 
 						Texture2DShader()
 						: Shader()

@@ -36,7 +36,7 @@ public:
 
 	virtual void 					draw();
 
-	virtual void 					drawShadowMap();
+	virtual void 					depthPass();
 
 	void 								attachChild(NodeUPtr node);
 	void 								removeChild();

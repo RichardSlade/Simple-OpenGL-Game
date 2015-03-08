@@ -13,7 +13,7 @@ private:
 	ShaderNode							*mShaderNode;
 
 	GLuint 								mVAO;
-	GLuint								mShadowVAO;
+	GLuint								mDepthVAO;
 	GLuint 								mEBO;
 	GLuint 								mNumElements;
 
@@ -42,7 +42,7 @@ public:
 														, glm::vec3 pos
 														, glm::vec3 scale
 														, GLuint VAO
-														, GLuint shadowVAO
+														, GLuint depthVAO
 														, GLuint EBO
 														, GLuint numEle
 														, GLuint texID = 0
@@ -52,7 +52,7 @@ public:
 
 	virtual void 					draw();
 
-	virtual void 					drawShadowMap();
+	virtual void 					depthPass();
 
 	// Setters
 	void 								setPosition(glm::vec3 pos);

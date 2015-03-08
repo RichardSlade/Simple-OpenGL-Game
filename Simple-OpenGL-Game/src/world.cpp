@@ -27,8 +27,8 @@ World::World(OGLRenderer &renderer)
 	// Build world using allocated mesh data
    buildWorld();
 
-   mRenderer.setDirLightSource(&mDirLightSource);
-   mRenderer.setPntLightSources(&mPntLightSources);
+//   mRenderer.setDirLightSource(&mDirLightSource);
+//   mRenderer.setPntLightSources(&mPntLightSources);
 }
 
 void World::loadObjects()
@@ -70,20 +70,23 @@ void World::buildWorld()
 	glm::vec3 lightScale(2.f, 2.f, 2.f);
 
 	// Create directional light source
-	mDirLightSource = glm::vec3(pos);
+//	mDirLightSource = glm::vec3(pos);
+	mDirLightSource = LightSource(pos, -pos);
 
 	createObject(LightObj
 					, ShaderNodeTypes::SimpleShaderNode
 					, pos
 					, lightScale);
 
-	lightScale = glm::vec3(0.25, 0.25, 0.25);
+	mRenderer.setDirLightSource(&mDirLightSource);
+
+//	lightScale = glm::vec3(0.25, 0.25, 0.25);
 
 //	mLightProjMatrix = glm::ortho<float>(-10,10,-10,10,-10,20);
-	mLightProjMatrix = glm::perspective(45.f, 4.0f / 3.0f, 0.1f, 100.0f);
-	mLightViewMatrix = glm::lookAt(mDirLightSource, -mDirLightSource, glm::vec3(0,1,0));
-	mRenderer.setLightVPMatrices(mLightViewMatrix
-											, mLightProjMatrix);
+//	mLightProjMatrix = glm::perspective(45.f, 4.0f / 3.0f, 0.1f, 100.0f);
+//	mLightViewMatrix = glm::lookAt(mDirLightSource, -mDirLightSource, glm::vec3(0,1,0));
+//	mRenderer.setLightVPMatrices(mLightViewMatrix
+//											, mLightProjMatrix);
 
 	// Create point light sources
 //	for(int i = 0; i < 1; i++)
@@ -103,9 +106,9 @@ void World::buildWorld()
 //					, glm::vec3(0, 1, 0));
 
 	// Floor
-	createObject(FloorObj
+	createObject(FloorDirLightObj
 //					, ShaderNodeTypes::SimpleShaderNode
-					, ShaderNodeTypes::ShadowShaderNode
+					, ShaderNodeTypes::DirLightShaderNode
 					, glm::vec3(0));
 
 	// Create objects
@@ -129,14 +132,14 @@ void World::createObject(ObjectTypes objType
 	switch(objType)
 	{
 		case CubeDirLightObj:
-		case CubePntLightObj:
+//		case CubePntLightObj:
 		{
 			OGLRenderer::VertexArrays vao;
 
-			if(objType == CubeDirLightObj)
+//			if(objType == CubeDirLightObj)
 				vao = OGLRenderer::VertexArrays::CubeDirLightVAO;
-			else
-				vao = OGLRenderer::VertexArrays::CubePntLightVAO;
+//			else
+//				vao = OGLRenderer::VertexArrays::CubePntLightVAO;
 
 			obj = std::unique_ptr<SceneNode>(new SceneNode(Node::NodeType::ScNode
 																		, mRenderer
@@ -144,7 +147,7 @@ void World::createObject(ObjectTypes objType
 																		, objPos
 																		, objScale
 																		, mRenderer.getVAO(vao)
-																		, mRenderer.getVAO(OGLRenderer::VertexArrays::CubeShadowVAO)
+																		, mRenderer.getVAO(OGLRenderer::VertexArrays::CubeDepthVAO)
 																		, mRenderer.getEBO(OGLRenderer::ElementArrayBuffers::CubeEBO)
 																		, mObjectMeshes.at(MeshType::Cube)->elementNum
 																		, mRenderer.getTex(OGLRenderer::Textures::WoodBoxTex)
@@ -153,14 +156,14 @@ void World::createObject(ObjectTypes objType
 			break;
 		}
 		case SphereDirLightObj:
-		case SpherePntLightObj:
+//		case SpherePntLightObj:
 		{
 			OGLRenderer::VertexArrays vao;
 
-			if(objType == SphereDirLightObj)
+//			if(objType == SphereDirLightObj)
 				vao = OGLRenderer::VertexArrays::EarthDirLightVAO;
-			else
-				vao = OGLRenderer::VertexArrays::EarthPntLightVAO;
+//			else
+//				vao = OGLRenderer::VertexArrays::EarthPntLightVAO;
 
 			obj = std::unique_ptr<SceneNode>(new SceneNode(Node::NodeType::ScNode
 																		, mRenderer
@@ -168,7 +171,7 @@ void World::createObject(ObjectTypes objType
 																		, objPos
 																		, objScale
 																		, mRenderer.getVAO(vao)
-																		, mRenderer.getVAO(OGLRenderer::VertexArrays::EarthShadowVAO)
+																		, mRenderer.getVAO(OGLRenderer::VertexArrays::EarthDepthVAO)
 																		, mRenderer.getEBO(OGLRenderer::ElementArrayBuffers::SphereEBO)
 																		, mObjectMeshes.at(MeshType::Earth)->elementNum
 																		, mRenderer.getTex(OGLRenderer::Textures::BlueMarbleTex)
@@ -190,15 +193,15 @@ void World::createObject(ObjectTypes objType
 
 			break;
 		}
-		case FloorObj:
+		case FloorDirLightObj:
 		{
 			obj = std::unique_ptr<SceneNode>(new SceneNode(Node::NodeType::ScNode
 																		, mRenderer
 																		, mSceneGraphShaderNodes.at(objShdr)
 																		, objPos
 																		, objScale
-																		, mRenderer.getVAO(OGLRenderer::VertexArrays::PlaneVAO)
-																		, mRenderer.getVAO(OGLRenderer::VertexArrays::PlaneShadowVAO)
+																		, mRenderer.getVAO(OGLRenderer::VertexArrays::PlaneDirLightVAO)
+																		, mRenderer.getVAO(OGLRenderer::VertexArrays::PlaneDepthVAO)
 																		, mRenderer.getEBO(OGLRenderer::ElementArrayBuffers::PlaneEBO)
 																		, 6));
 
@@ -213,37 +216,21 @@ void World::createObject(ObjectTypes objType
 
 void World::drawWorld()
 {
-//	glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10,10,-10,10,-10,20);
-//	glm::mat4 depthProjectionMatrix = glm::frustrum<float>(-1.0f,1.0f,-10,10,-10,20);
-//	glm::mat4 depthProjectionMatrix = glm::mat4(1);
-//	glm::mat4 depthProjectionMatrix = glm::;
-//	glm::mat4 depthViewMatrix = glm::lookAt(getViewDirection(), -mDirLightSource, glm::vec3(0,1,0));
-//	glm::mat4 depthViewMatrix = glm::lookAt(-mDirLightSource, glm::vec3(0,0,0), glm::vec3(0,1,0));
-
-//	glm::mat4 depthModelMatrix = glm::mat4(1);
-//	glm::mat4 depthModelMatrix = glm::translate(mDirLightSource);
-//	glm::mat4 depthMVP = getProjectionMatrix() * depthViewMatrix * depthModelMatrix;
-//	glm::mat4 depthMVP = depthProjectionMatrix * depthViewMatrix * depthModelMatrix;
-//	glm::mat4 depthMVP = glm::mat4(1);
-
-//   mRenderer.setupShadowDepthShader();
-
 	enum isDepthPass {Normal, Depth};
 
 	// Shadow map pass
-//	mRenderer.setupDepthPass(mLightViewMatrix
-//								, mLightProjMatrix);
-
 	mRenderer.clearContext(isDepthPass::Depth);
-	mRenderer.setupShader(mRenderer.getShaderProgramID(OGLRenderer::Programs::DepthProgram));
 
-	mSceneGraph.drawShadowMap();
+	mRenderer.setupDepthPass();
 
-//	mRenderer.clearContext(isDepthPass::Normal);
-	mRenderer.drawShadowMap();
+//	mRenderer.setupShader(mRenderer.getShaderProgramID(OGLRenderer::Programs::DepthProgram));
+
+	mSceneGraph.depthPass();
+
+	mRenderer.finishDepthPass();
 
 	// Now regular rendering pass
-//	mRenderer.clearContext(isDepthPass::Normal);
+	mRenderer.clearContext(isDepthPass::Normal);
 
-//	mSceneGraph.draw();
+	mSceneGraph.draw();
 }
