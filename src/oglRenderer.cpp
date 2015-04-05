@@ -81,6 +81,7 @@ bool OGLRenderer::loadPrograms()
 
 	pID = LoadShaders(shader_info_two);
 
+
 	if(pID == 0)
 	{
 		std::cerr << "Error: OGLRenderer.loadPrograms(): DirLighting Shader" << std::endl;
@@ -135,7 +136,6 @@ bool OGLRenderer::loadPrograms()
 
 	return true;
 }
-
 bool OGLRenderer::loadTextures(sf::Vector2u windowSize)
 {
 	glGenTextures(NumTex, &mTex[0]);
